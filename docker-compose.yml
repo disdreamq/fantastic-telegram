@@ -54,9 +54,9 @@ services:
     networks:
       - app_network
 
-  api:
+  user:
     build:
-      context: .
+      context: ./services/user
       dockerfile: Dockerfile
     container_name: BlogApi
     restart: unless-stopped
