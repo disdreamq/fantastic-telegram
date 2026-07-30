@@ -1,0 +1,10 @@
+.git
+.env
+*.test
+vendor/
+.postgres_data
+.redis_data
+.vscode
+
+.koda
+AGENTS.md

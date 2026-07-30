@@ -1,0 +1,4 @@
+.env
+.vscode
+.redis_data
+.postgres_data
