@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package api;
+
+service UserService {
+  rpc GetUser(GetUserRequest) returns (GetUserResponse);
+}
+message GetUserRequest { int64 user_id = 1; }
+message GetUserResponse { int64 id = 1; string username = 2; bool exists = 3; }
