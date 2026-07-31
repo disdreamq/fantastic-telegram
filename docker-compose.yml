@@ -53,7 +53,36 @@ services:
         compress: "true"
     networks:
       - app_network
-
+    
+  post:
+    build:
+      context: .
+      dockerfile: services/post/Dockerfile
+    dns:
+    - 8.8.8.8
+    - 1.1.1.1
+    container_name: post_service
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    env_file:
+      - ./.env
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      REDIS_URL: redis://:${REDIS_PASSWORD}@${REDIS_HOST}:${REDIS_PORT}/${REDIS_DB:-0}
+      HTTP_PORT: ${HTTP_PORT}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./logs:/app/logs
+    networks:
+      - app_network
+  
   user:
     build:
       context: .
@@ -68,8 +97,12 @@ services:
     env_file:
       - ./.env
     environment:
-      - DATABASE_URL=postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
-      - REDIS_URL=redis://:${REDIS_PASSWORD}@${REDIS_HOST}:${REDIS_PORT}/${REDIS_DB:-0}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      REDIS_URL: redis://:${REDIS_PASSWORD}@${REDIS_HOST}:${REDIS_PORT}/${REDIS_DB:-0}
+      HTTP_PORT: ${HTTP_PORT}
+      GRPC_PORT: ${GRPC_PORT}
     depends_on:
       postgres:
         condition: service_healthy
@@ -79,6 +112,7 @@ services:
       - ./logs:/app/logs
     networks:
       - app_network
+
 
 networks:
   app_network:
