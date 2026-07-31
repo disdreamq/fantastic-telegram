@@ -5,5 +5,5 @@ option go_package = "/proto";
 service UserService {
   rpc GetUser(GetUserRequest) returns (GetUserResponse);
 }
-message GetUserRequest { int64 user_id = 1; }
-message GetUserResponse { int64 id = 1; string username = 2; bool exists = 3; }
+message GetUserRequest { int64 user_id = 1; string request_ID = 2; }
+message GetUserResponse { int64 ID = 1; string username = 2; bool exists = 3; string request_ID = 4; }
