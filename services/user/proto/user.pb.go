@@ -7,12 +7,11 @@
 package proto
 
 import (
+	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
+	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
-
-	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
-	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 )
 
 const (
@@ -22,28 +21,27 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-type GetUserRequest struct {
+type ValidateTokenRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	UserId        int64                  `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
-	Request_ID    string                 `protobuf:"bytes,2,opt,name=request_ID,json=requestID,proto3" json:"request_ID,omitempty"`
+	Token         string                 `protobuf:"bytes,1,opt,name=token,proto3" json:"token,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *GetUserRequest) Reset() {
-	*x = GetUserRequest{}
+func (x *ValidateTokenRequest) Reset() {
+	*x = ValidateTokenRequest{}
 	mi := &file_services_user_proto_user_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *GetUserRequest) String() string {
+func (x *ValidateTokenRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*GetUserRequest) ProtoMessage() {}
+func (*ValidateTokenRequest) ProtoMessage() {}
 
-func (x *GetUserRequest) ProtoReflect() protoreflect.Message {
+func (x *ValidateTokenRequest) ProtoReflect() protoreflect.Message {
 	mi := &file_services_user_proto_user_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -55,49 +53,41 @@ func (x *GetUserRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetUserRequest.ProtoReflect.Descriptor instead.
-func (*GetUserRequest) Descriptor() ([]byte, []int) {
+// Deprecated: Use ValidateTokenRequest.ProtoReflect.Descriptor instead.
+func (*ValidateTokenRequest) Descriptor() ([]byte, []int) {
 	return file_services_user_proto_user_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *GetUserRequest) GetUserId() int64 {
+func (x *ValidateTokenRequest) GetToken() string {
 	if x != nil {
-		return x.UserId
-	}
-	return 0
-}
-
-func (x *GetUserRequest) GetRequest_ID() string {
-	if x != nil {
-		return x.Request_ID
+		return x.Token
 	}
 	return ""
 }
 
-type GetUserResponse struct {
+type ValidateTokenResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	ID            int64                  `protobuf:"varint,1,opt,name=ID,proto3" json:"ID,omitempty"`
-	Username      string                 `protobuf:"bytes,2,opt,name=username,proto3" json:"username,omitempty"`
-	Exists        bool                   `protobuf:"varint,3,opt,name=exists,proto3" json:"exists,omitempty"`
-	Request_ID    string                 `protobuf:"bytes,4,opt,name=request_ID,json=requestID,proto3" json:"request_ID,omitempty"`
+	Valid         bool                   `protobuf:"varint,1,opt,name=valid,proto3" json:"valid,omitempty"`
+	UserID        int64                  `protobuf:"varint,2,opt,name=userID,proto3" json:"userID,omitempty"`
+	UserEmail     string                 `protobuf:"bytes,3,opt,name=user_email,json=userEmail,proto3" json:"user_email,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *GetUserResponse) Reset() {
-	*x = GetUserResponse{}
+func (x *ValidateTokenResponse) Reset() {
+	*x = ValidateTokenResponse{}
 	mi := &file_services_user_proto_user_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *GetUserResponse) String() string {
+func (x *ValidateTokenResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*GetUserResponse) ProtoMessage() {}
+func (*ValidateTokenResponse) ProtoMessage() {}
 
-func (x *GetUserResponse) ProtoReflect() protoreflect.Message {
+func (x *ValidateTokenResponse) ProtoReflect() protoreflect.Message {
 	mi := &file_services_user_proto_user_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -109,35 +99,28 @@ func (x *GetUserResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetUserResponse.ProtoReflect.Descriptor instead.
-func (*GetUserResponse) Descriptor() ([]byte, []int) {
+// Deprecated: Use ValidateTokenResponse.ProtoReflect.Descriptor instead.
+func (*ValidateTokenResponse) Descriptor() ([]byte, []int) {
 	return file_services_user_proto_user_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *GetUserResponse) GetID() int64 {
+func (x *ValidateTokenResponse) GetValid() bool {
 	if x != nil {
-		return x.ID
-	}
-	return 0
-}
-
-func (x *GetUserResponse) GetUsername() string {
-	if x != nil {
-		return x.Username
-	}
-	return ""
-}
-
-func (x *GetUserResponse) GetExists() bool {
-	if x != nil {
-		return x.Exists
+		return x.Valid
 	}
 	return false
 }
 
-func (x *GetUserResponse) GetRequest_ID() string {
+func (x *ValidateTokenResponse) GetUserID() int64 {
 	if x != nil {
-		return x.Request_ID
+		return x.UserID
+	}
+	return 0
+}
+
+func (x *ValidateTokenResponse) GetUserEmail() string {
+	if x != nil {
+		return x.UserEmail
 	}
 	return ""
 }
@@ -146,19 +129,16 @@ var File_services_user_proto_user_proto protoreflect.FileDescriptor
 
 const file_services_user_proto_user_proto_rawDesc = "" +
 	"\n" +
-	"\x1eservices/user/proto/user.proto\"H\n" +
-	"\x0eGetUserRequest\x12\x17\n" +
-	"\auser_id\x18\x01 \x01(\x03R\x06userId\x12\x1d\n" +
+	"\x1eservices/user/proto/user.proto\",\n" +
+	"\x14ValidateTokenRequest\x12\x14\n" +
+	"\x05token\x18\x01 \x01(\tR\x05token\"d\n" +
+	"\x15ValidateTokenResponse\x12\x14\n" +
+	"\x05valid\x18\x01 \x01(\bR\x05valid\x12\x16\n" +
+	"\x06userID\x18\x02 \x01(\x03R\x06userID\x12\x1d\n" +
 	"\n" +
-	"request_ID\x18\x02 \x01(\tR\trequestID\"t\n" +
-	"\x0fGetUserResponse\x12\x0e\n" +
-	"\x02ID\x18\x01 \x01(\x03R\x02ID\x12\x1a\n" +
-	"\busername\x18\x02 \x01(\tR\busername\x12\x16\n" +
-	"\x06exists\x18\x03 \x01(\bR\x06exists\x12\x1d\n" +
-	"\n" +
-	"request_ID\x18\x04 \x01(\tR\trequestID2;\n" +
-	"\vUserService\x12,\n" +
-	"\aGetUser\x12\x0f.GetUserRequest\x1a\x10.GetUserResponseB\bZ\x06/protob\x06proto3"
+	"user_email\x18\x03 \x01(\tR\tuserEmail2M\n" +
+	"\vUserService\x12>\n" +
+	"\rValidateToken\x12\x15.ValidateTokenRequest\x1a\x16.ValidateTokenResponseB\bZ\x06/protob\x06proto3"
 
 var (
 	file_services_user_proto_user_proto_rawDescOnce sync.Once
@@ -174,12 +154,12 @@ func file_services_user_proto_user_proto_rawDescGZIP() []byte {
 
 var file_services_user_proto_user_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_services_user_proto_user_proto_goTypes = []any{
-	(*GetUserRequest)(nil),  // 0: GetUserRequest
-	(*GetUserResponse)(nil), // 1: GetUserResponse
+	(*ValidateTokenRequest)(nil),  // 0: ValidateTokenRequest
+	(*ValidateTokenResponse)(nil), // 1: ValidateTokenResponse
 }
 var file_services_user_proto_user_proto_depIdxs = []int32{
-	0, // 0: UserService.GetUser:input_type -> GetUserRequest
-	1, // 1: UserService.GetUser:output_type -> GetUserResponse
+	0, // 0: UserService.ValidateToken:input_type -> ValidateTokenRequest
+	1, // 1: UserService.ValidateToken:output_type -> ValidateTokenResponse
 	1, // [1:2] is the sub-list for method output_type
 	0, // [0:1] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
