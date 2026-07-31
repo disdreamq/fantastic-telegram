@@ -7,11 +7,12 @@
 package proto
 
 import (
-	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
-	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
+
+	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
+	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 )
 
 const (
@@ -24,6 +25,7 @@ const (
 type GetUserRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	UserId        int64                  `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	Request_ID    string                 `protobuf:"bytes,2,opt,name=request_ID,json=requestID,proto3" json:"request_ID,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -65,11 +67,19 @@ func (x *GetUserRequest) GetUserId() int64 {
 	return 0
 }
 
+func (x *GetUserRequest) GetRequest_ID() string {
+	if x != nil {
+		return x.Request_ID
+	}
+	return ""
+}
+
 type GetUserResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	ID            int64                  `protobuf:"varint,1,opt,name=ID,proto3" json:"ID,omitempty"`
 	Username      string                 `protobuf:"bytes,2,opt,name=username,proto3" json:"username,omitempty"`
 	Exists        bool                   `protobuf:"varint,3,opt,name=exists,proto3" json:"exists,omitempty"`
+	Request_ID    string                 `protobuf:"bytes,4,opt,name=request_ID,json=requestID,proto3" json:"request_ID,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -104,9 +114,9 @@ func (*GetUserResponse) Descriptor() ([]byte, []int) {
 	return file_services_user_proto_user_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *GetUserResponse) GetId() int64 {
+func (x *GetUserResponse) GetID() int64 {
 	if x != nil {
-		return x.Id
+		return x.ID
 	}
 	return 0
 }
@@ -125,19 +135,30 @@ func (x *GetUserResponse) GetExists() bool {
 	return false
 }
 
+func (x *GetUserResponse) GetRequest_ID() string {
+	if x != nil {
+		return x.Request_ID
+	}
+	return ""
+}
+
 var File_services_user_proto_user_proto protoreflect.FileDescriptor
 
 const file_services_user_proto_user_proto_rawDesc = "" +
 	"\n" +
-	"\x1eservices/user/proto/user.proto\")\n" +
+	"\x1eservices/user/proto/user.proto\"H\n" +
 	"\x0eGetUserRequest\x12\x17\n" +
-	"\auser_id\x18\x01 \x01(\x03R\x06userId\"U\n" +
+	"\auser_id\x18\x01 \x01(\x03R\x06userId\x12\x1d\n" +
+	"\n" +
+	"request_ID\x18\x02 \x01(\tR\trequestID\"t\n" +
 	"\x0fGetUserResponse\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x1a\n" +
+	"\x02ID\x18\x01 \x01(\x03R\x02ID\x12\x1a\n" +
 	"\busername\x18\x02 \x01(\tR\busername\x12\x16\n" +
-	"\x06exists\x18\x03 \x01(\bR\x06exists2;\n" +
+	"\x06exists\x18\x03 \x01(\bR\x06exists\x12\x1d\n" +
+	"\n" +
+	"request_ID\x18\x04 \x01(\tR\trequestID2;\n" +
 	"\vUserService\x12,\n" +
-	"\aGetUser\x12\x0f.GetUserRequest\x1a\x10.GetUserResponseB=Z;github.com/disdreamq/fantastic-telegram/services/user/protob\x06proto3"
+	"\aGetUser\x12\x0f.GetUserRequest\x1a\x10.GetUserResponseB\bZ\x06/protob\x06proto3"
 
 var (
 	file_services_user_proto_user_proto_rawDescOnce sync.Once
