@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/disdreamq/fantastic-telegram/services/user/internal/infra/jwt"
-	"github.com/disdreamq/fantastic-telegram/services/user/internal/middleware"
+	"github.com/disdreamq/fantastic-telegram/services/user/internal/transport/http/middleware"
 	"github.com/go-chi/chi/v5"
 	"github.com/redis/go-redis/v9"
 	"github.com/rs/zerolog"
