@@ -40,8 +40,12 @@ type Config struct {
 	// CORS
 	CORSOrigins []string `envconfig:"CORS_ORIGINS" required:"true"`
 
-	//Logging
+	// Logging
 	LogLevel string `envconfig:"LOG_LEVEL" default:"error"`
+
+	// Ports
+	HttpPort int `envconfig:"HTTP_PORT" default:"8080"`
+	GrpcPort int `envconfig:"GRPC_PORT" default:"50051"`
 }
 
 func (c *Config) PostgresDSN() string {

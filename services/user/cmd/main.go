@@ -19,16 +19,17 @@ import (
 	"syscall"
 	"time"
 
-	_ "github.com/disdreamq/BlogApi/docs"
+	"github.com/disdreamq/fantastic-telegram/services/user/config"
+	_ "github.com/disdreamq/fantastic-telegram/services/user/docs"
+	"github.com/disdreamq/fantastic-telegram/services/user/internal/infra/hasher"
+	"github.com/disdreamq/fantastic-telegram/services/user/internal/infra/jwt"
+	"github.com/disdreamq/fantastic-telegram/services/user/internal/repository/postgres"
+	"github.com/disdreamq/fantastic-telegram/services/user/internal/repository/redis"
+
+	"github.com/disdreamq/fantastic-telegram/services/user/internal/service"
+	"github.com/disdreamq/fantastic-telegram/services/user/internal/transport/http/handler"
 	"github.com/fatih/color"
 
-	"github.com/disdreamq/BlogApi/config"
-	"github.com/disdreamq/BlogApi/internal/handler"
-	"github.com/disdreamq/BlogApi/internal/infra/hasher"
-	"github.com/disdreamq/BlogApi/internal/infra/jwt"
-	"github.com/disdreamq/BlogApi/internal/repository/postgres"
-	"github.com/disdreamq/BlogApi/internal/repository/redis"
-	"github.com/disdreamq/BlogApi/internal/service"
 	"github.com/joho/godotenv"
 	"github.com/rs/zerolog"
 	httpSwagger "github.com/swaggo/http-swagger"
@@ -37,13 +38,12 @@ import (
 func printBanner(cfg *config.Config) {
 	color.NoColor = false // Force colors
 
-	banner := `
-██████╗ ██╗      ██████╗  ██████╗        █████╗ ██████╗ ██╗
-██╔══██╗██║     ██╔═══██╗██╔════╝       ██╔══██╗██╔══██╗██║
-██████╔╝██║     ██║   ██║██║  ███╗█████╗███████║██████╔╝██║
-██╔══██╗██║     ██║   ██║██║   ██║╚════╝██╔══██║██╔═══╝ ██║
-██████╔╝███████╗╚██████╔╝╚██████╔╝      ██║  ██║██║     ██║
-╚═════╝ ╚══════╝ ╚═════╝  ╚═════╝       ╚═╝  ╚═╝╚═╝     ╚═╝ `
+	banner := ` ______   ______     __   __     ______   ______     ______     ______   __     ______     ______   ______     __         ______     ______     ______     ______     __    __    
+/\  ___\ /\  __ \   /\ "-.\ \   /\__  _\ /\  __ \   /\  ___\   /\__  _\ /\ \   /\  ___\   /\__  _\ /\  ___\   /\ \       /\  ___\   /\  ___\   /\  == \   /\  __ \   /\ "-./  \   
+\ \  __\ \ \  __ \  \ \ \-.  \  \/_/\ \/ \ \  __ \  \ \___  \  \/_/\ \/ \ \ \  \ \ \____  \/_/\ \/ \ \  __\   \ \ \____  \ \  __\   \ \ \__ \  \ \  __<   \ \  __ \  \ \ \-./\ \  
+ \ \_\    \ \_\ \_\  \ \_\\"\_\    \ \_\  \ \_\ \_\  \/\_____\    \ \_\  \ \_\  \ \_____\    \ \_\  \ \_____\  \ \_____\  \ \_____\  \ \_____\  \ \_\ \_\  \ \_\ \_\  \ \_\ \ \_\ 
+  \/_/     \/_/\/_/   \/_/ \/_/     \/_/   \/_/\/_/   \/_____/     \/_/   \/_/   \/_____/     \/_/   \/_____/   \/_____/   \/_____/   \/_____/   \/_/ /_/   \/_/\/_/   \/_/  \/_/ 
+                                                                                                                                                                                  `
 
 	red := color.New(color.FgRed, color.Bold)
 	green := color.New(color.FgGreen, color.Bold)
@@ -54,10 +54,10 @@ func printBanner(cfg *config.Config) {
 	red.Println(banner)
 	println()
 
-	port := "8080"
+	http_port := cfg.HttpPort
 
 	yellow.Println("Configuration:")
-	white.Printf("   Port:        %s\n", port)
+	white.Printf("   Port:        %d\n", http_port)
 	white.Printf("   JWT Expiry:  %s\n", time.Duration(cfg.Expiry).String())
 	white.Printf("   Rate Limit:  Public=%d RPM, Protected=%d RPM\n", cfg.PublicRPM, cfg.ProtectedRPM)
 	println()
@@ -71,16 +71,10 @@ func printBanner(cfg *config.Config) {
 	green.Println("   ✓ Recovery middleware enabled")
 	println()
 
-	yellow.Println("Authentication:")
-	white.Println("   Public endpoints:  POST /register, POST /login")
-	white.Println("   Protected:         PUT/DELETE users, POST/GET/PUT/DELETE posts")
-	white.Println("   Header:            Authorization: Bearer <token>")
-	println()
-
 	magenta.Println("Endpoints:")
-	white.Printf("   API Base:     http://localhost:%s/\n", port)
-	white.Printf("   Swagger:      http://localhost:%s/swagger/\n", port)
-	white.Printf("   Swagger JSON: http://localhost:%s/swagger/doc.json\n", port)
+	white.Printf("   API Base:     http://localhost:%d/\n", http_port)
+	white.Printf("   Swagger:      http://localhost:%d/swagger/\n", http_port)
+	white.Printf("   Swagger JSON: http://localhost:%d/swagger/doc.json\n", http_port)
 	println()
 
 	yellow.Println("🚀 Server is running! Press CTRL+C to stop.")
@@ -94,8 +88,8 @@ func main() {
 	logger.Info().Msg("Starting the application.")
 
 	// Load cfg
-	if _, err := os.Stat(".env"); err == nil {
-		err := godotenv.Load()
+	if _, err := os.Stat("../../.env"); err == nil {
+		err := godotenv.Load("../../.env")
 		if err != nil {
 			logger.Fatal().Err(err).Msg("Fatal error during parse env file.")
 		}
@@ -107,7 +101,6 @@ func main() {
 	if err != nil {
 		logger.Err(err).Str("component", "Redis").Msg("Redis could not connect to db.")
 	}
-	cache := redis.NewRedisCache(rdb)
 
 	// connect to DB
 	DB, err := postgres.NewPostgresDB(cfg)
@@ -121,17 +114,12 @@ func main() {
 	userSVC := service.NewUserService(userRepo, hasher)
 	userCtrl := handler.NewUserController(userSVC)
 
-	// prepare post controller
-	postRepo := postgres.NewPostRepository(DB)
-	postSVC := service.NewPostService(postRepo, cache)
-	postCtrl := handler.NewPostController(postSVC)
-
 	// prepare auth controller
 	prov := jwt.NewProvider(cfg.SecretKey, time.Duration(cfg.Expiry))
 	authSVC := service.NewAuthService(userRepo, hasher, prov)
 	authCtrl := handler.NewAuthController(authSVC)
 
-	r := handler.NewRouter(rdb, userCtrl, postCtrl, authCtrl, cfg.SecretKey, time.Duration(cfg.Expiry), cfg.PublicRPM, cfg.ProtectedRPM, logger)
+	r := handler.NewRouter(rdb, userCtrl, authCtrl, cfg.SecretKey, time.Duration(cfg.Expiry), cfg.PublicRPM, cfg.ProtectedRPM, logger)
 
 	// Swagger
 	r.Get("/swagger/*", httpSwagger.Handler(

@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/disdreamq/fantastic-telegram/services/user/internal/domain"
-	postgres "github.com/disdreamq/fantastic-telegram/services/user/internal/repository"
+	"github.com/disdreamq/fantastic-telegram/services/user/internal/repository/postgres"
 )
 
 func TestUserRepository_Create(t *testing.T) {

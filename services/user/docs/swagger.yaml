@@ -15,14 +15,12 @@ definitions:
         type: string
       token_payload: {}
     type: object
-  handler.CreatePostRequest:
+  handler.ErrorResponse:
     properties:
-      content:
-        type: string
-      title:
+      error:
         type: string
     type: object
-  handler.CreateUserRequest:
+  handler.createUserRequest:
     properties:
       email:
         example: user@example.com
@@ -34,33 +32,7 @@ definitions:
         example: johndoe
         type: string
     type: object
-  handler.ErrorResponse:
-    properties:
-      error:
-        type: string
-    type: object
-  handler.PostResponse:
-    properties:
-      content:
-        type: string
-      created_at: {}
-      id:
-        type: integer
-      title:
-        type: string
-      user_id:
-        type: integer
-    type: object
-  handler.UpdatePostRequest:
-    properties:
-      content:
-        type: string
-      id:
-        type: integer
-      title:
-        type: string
-    type: object
-  handler.UpdateUserRequest:
+  handler.updateUserRequest:
     properties:
       email:
         type: string
@@ -72,7 +44,7 @@ definitions:
       username:
         type: string
     type: object
-  handler.UserResponse:
+  handler.userResponse:
     properties:
       created_at:
         type: string
@@ -128,199 +100,6 @@ paths:
       summary: Login to the blog
       tags:
       - auth
-  /posts/:
-    post:
-      consumes:
-      - application/json
-      description: Creates a new post for the authenticated user (requires authentication)
-      parameters:
-      - description: Post data
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/handler.CreatePostRequest'
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Created
-          schema:
-            $ref: '#/definitions/handler.PostResponse'
-        "400":
-          description: invalid JSON / invalid title or content
-          schema:
-            $ref: '#/definitions/handler.ErrorResponse'
-        "401":
-          description: unauthorized
-          schema:
-            $ref: '#/definitions/handler.ErrorResponse'
-        "409":
-          description: linked user with this id doesnt exists
-          schema:
-            $ref: '#/definitions/handler.ErrorResponse'
-        "500":
-          description: failed to create post
-          schema:
-            $ref: '#/definitions/handler.ErrorResponse'
-      security:
-      - BearerAuth: []
-      summary: Create a new post
-      tags:
-      - posts
-  /posts/{postID}:
-    delete:
-      consumes:
-      - application/json
-      description: Removes a post by ID (requires authentication)
-      parameters:
-      - description: Post ID
-        in: path
-        name: postID
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "204":
-          description: No Content
-          schema:
-            type: string
-        "400":
-          description: invalid post ID / invalid user ID
-          schema:
-            $ref: '#/definitions/handler.ErrorResponse'
-        "401":
-          description: unauthorized
-          schema:
-            $ref: '#/definitions/handler.ErrorResponse'
-        "404":
-          description: post not found
-          schema:
-            $ref: '#/definitions/handler.ErrorResponse'
-        "500":
-          description: failed to get post
-          schema:
-            $ref: '#/definitions/handler.ErrorResponse'
-      security:
-      - BearerAuth: []
-      summary: Delete a post
-      tags:
-      - posts
-    put:
-      consumes:
-      - application/json
-      description: Updates an existing post by ID (requires authentication)
-      parameters:
-      - description: Post ID
-        in: path
-        name: postID
-        required: true
-        type: integer
-      - description: Post data to update
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/handler.UpdatePostRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            type: string
-        "400":
-          description: invalid post ID / invalid JSON / invalid user ID
-          schema:
-            $ref: '#/definitions/handler.ErrorResponse'
-        "401":
-          description: unauthorized
-          schema:
-            $ref: '#/definitions/handler.ErrorResponse'
-        "404":
-          description: user not found
-          schema:
-            $ref: '#/definitions/handler.ErrorResponse'
-        "500":
-          description: failed to get post
-          schema:
-            $ref: '#/definitions/handler.ErrorResponse'
-      security:
-      - BearerAuth: []
-      summary: Update a post
-      tags:
-      - posts
-  /posts/id/{postID}:
-    get:
-      consumes:
-      - application/json
-      description: Returns a single post by its ID (requires authentication)
-      parameters:
-      - description: Post ID
-        in: path
-        name: postID
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/handler.PostResponse'
-        "400":
-          description: invalid post ID
-          schema:
-            $ref: '#/definitions/handler.ErrorResponse'
-        "401":
-          description: unauthorized
-          schema:
-            $ref: '#/definitions/handler.ErrorResponse'
-        "404":
-          description: post not found
-          schema:
-            $ref: '#/definitions/handler.ErrorResponse'
-        "500":
-          description: failed to get post
-          schema:
-            $ref: '#/definitions/handler.ErrorResponse'
-      summary: Get post by ID
-      tags:
-      - posts
-  /posts/title/{title}:
-    get:
-      consumes:
-      - application/json
-      description: Returns a single post by its title (requires authentication)
-      parameters:
-      - description: Post Title
-        in: path
-        name: title
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/handler.PostResponse'
-        "400":
-          description: invalid post title / failed to get post
-          schema:
-            $ref: '#/definitions/handler.ErrorResponse'
-        "401":
-          description: unauthorized
-          schema:
-            $ref: '#/definitions/handler.ErrorResponse'
-        "404":
-          description: post not found
-          schema:
-            $ref: '#/definitions/handler.ErrorResponse'
-      summary: Get post by title
-      tags:
-      - posts
   /register:
     post:
       consumes:
@@ -332,14 +111,14 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/handler.CreateUserRequest'
+          $ref: '#/definitions/handler.createUserRequest'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/handler.UserResponse'
+            $ref: '#/definitions/handler.userResponse'
         "400":
           description: invalid JSON
           schema:
@@ -413,7 +192,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/handler.UpdateUserRequest'
+          $ref: '#/definitions/handler.updateUserRequest'
       produces:
       - application/json
       responses:
@@ -459,7 +238,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/handler.UserResponse'
+            $ref: '#/definitions/handler.userResponse'
         "400":
           description: failed to get user
           schema:
@@ -494,7 +273,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/handler.UserResponse'
+            $ref: '#/definitions/handler.userResponse'
         "400":
           description: invalid user ID
           schema:

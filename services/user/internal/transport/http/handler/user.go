@@ -56,8 +56,8 @@ func NewUserController(userService port.UserService) *UserController {
 // @Tags         users
 // @Accept       json
 // @Produce      json
-// @Param        request  body      CreateUserRequest  true  "User registration data"
-// @Success      201      {object}  UserResponse
+// @Param        request  body      createUserRequest  true  "User registration data"
+// @Success      201      {object}  userResponse
 // @Failure      400      {object}  ErrorResponse  "invalid JSON"
 // @Failure      409      {object}  ErrorResponse  "user with this email already exists"
 // @Failure      404      {object}  ErrorResponse  "user not found"
@@ -97,7 +97,7 @@ func (c *UserController) Create(w http.ResponseWriter, r *http.Request) {
 // @Produce      json
 // @Security     BearerAuth
 // @Param        userID  path      int  true  "User ID"
-// @Success      200     {object}  UserResponse
+// @Success      200     {object}  userResponse
 // @Failure      400     {object}  ErrorResponse  "invalid user ID"
 // @Failure      401     {object}  ErrorResponse  "unauthorized"
 // @Failure      404     {object}  ErrorResponse  "user not found"
@@ -134,7 +134,7 @@ func (c *UserController) GetByID(w http.ResponseWriter, r *http.Request) {
 // @Produce      json
 // @Security     BearerAuth
 // @Param        email  path      string  true  "User Email"
-// @Success      200    {object}  UserResponse
+// @Success      200    {object}  userResponse
 // @Failure      400    {object}  ErrorResponse  "failed to get user"
 // @Failure      401    {object}  ErrorResponse  "unauthorized"
 // @Failure      404    {object}  ErrorResponse  "user not found"
@@ -171,7 +171,7 @@ func (c *UserController) GetByEmail(w http.ResponseWriter, r *http.Request) {
 // @Produce      json
 // @Security     BearerAuth
 // @Param        userID    path      int                  true  "User ID"
-// @Param        request   body      UpdateUserRequest    true  "User data to update"
+// @Param        request   body      updateUserRequest    true  "User data to update"
 // @Success      200       {string} string               "OK"
 // @Failure      400       {object} ErrorResponse        "invalid user ID / invalid JSON"
 // @Failure      401       {object} ErrorResponse        "unauthorized"
