@@ -9,7 +9,7 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
-      - ./.postgres_data:/var/lib/postgresql/data
+      - ./docker_data/.postgres_data:/var/lib/postgresql/data
     ports:
       - "${POSTGRES_PORT}:5432"
     restart: unless-stopped
@@ -34,7 +34,7 @@ services:
     env_file:
       - ./.env
     volumes:
-      - ./.redis_data:/data
+      - ./docker_data/.redis_data:/data
     restart: unless-stopped
     ports:
       - "${REDIS_PORT}:6379"
@@ -56,9 +56,12 @@ services:
 
   user:
     build:
-      context: ./services/user
-      dockerfile: Dockerfile
-    container_name: BlogApi
+      context: .
+      dockerfile: services/user/Dockerfile
+    dns:
+    - 8.8.8.8
+    - 1.1.1.1
+    container_name: user_service
     restart: unless-stopped
     ports:
       - "8080:8080"
