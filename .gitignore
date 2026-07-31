@@ -2,3 +2,4 @@
 .vscode
 .redis_data
 .postgres_data
+docker_data/

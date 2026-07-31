@@ -5,3 +5,4 @@ vendor/
 .postgres_data
 .redis_data
 .vscode
+docker_data/
