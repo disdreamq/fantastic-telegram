@@ -44,7 +44,7 @@ type Config struct {
 	LogLevel string `envconfig:"LOG_LEVEL" default:"error"`
 
 	// Ports
-	HttpPort int `envconfig:"HTTP_PORT" default:"8080"`
+	HttpPort int `envconfig:"USER_HTTP_PORT" default:"8080"`
 	GrpcPort int `envconfig:"GRPC_PORT" default:"50051"`
 }
 
