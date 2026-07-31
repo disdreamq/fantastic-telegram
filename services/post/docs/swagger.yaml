@@ -1,0 +1,248 @@
+basePath: /
+definitions:
+  handler.ErrorResponse:
+    properties:
+      error:
+        type: string
+    type: object
+  handler.createPostRequest:
+    properties:
+      content:
+        type: string
+      title:
+        type: string
+    type: object
+  handler.postResponse:
+    properties:
+      content:
+        type: string
+      created_at: {}
+      id:
+        type: integer
+      title:
+        type: string
+      user_id:
+        type: integer
+    type: object
+  handler.updatePostRequest:
+    properties:
+      content:
+        type: string
+      id:
+        type: integer
+      title:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: REST API для блога с авторизацией, управлением пользователями и постами
+  title: Blog API
+  version: "1.0"
+paths:
+  /posts/:
+    post:
+      consumes:
+      - application/json
+      description: Creates a new post for the authenticated user (requires authentication)
+      parameters:
+      - description: Post data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handler.createPostRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/handler.postResponse'
+        "400":
+          description: invalid JSON / invalid title or content
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "401":
+          description: unauthorized
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "409":
+          description: linked user with this id doesnt exists
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "500":
+          description: failed to create post
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Create a new post
+      tags:
+      - posts
+  /posts/{postID}:
+    delete:
+      consumes:
+      - application/json
+      description: Removes a post by ID (requires authentication)
+      parameters:
+      - description: Post ID
+        in: path
+        name: postID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+          schema:
+            type: string
+        "400":
+          description: invalid post ID / invalid user ID
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "401":
+          description: unauthorized
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "404":
+          description: post not found
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "500":
+          description: failed to get post
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete a post
+      tags:
+      - posts
+    put:
+      consumes:
+      - application/json
+      description: Updates an existing post by ID (requires authentication)
+      parameters:
+      - description: Post ID
+        in: path
+        name: postID
+        required: true
+        type: integer
+      - description: Post data to update
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handler.updatePostRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: invalid post ID / invalid JSON / invalid user ID
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "401":
+          description: unauthorized
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "404":
+          description: user not found
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "500":
+          description: failed to get post
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Update a post
+      tags:
+      - posts
+  /posts/id/{postID}:
+    get:
+      consumes:
+      - application/json
+      description: Returns a single post by its ID (requires authentication)
+      parameters:
+      - description: Post ID
+        in: path
+        name: postID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.postResponse'
+        "400":
+          description: invalid post ID
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "401":
+          description: unauthorized
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "404":
+          description: post not found
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "500":
+          description: failed to get post
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get post by ID
+      tags:
+      - posts
+  /posts/title/{title}:
+    get:
+      consumes:
+      - application/json
+      description: Returns a single post by its title (requires authentication)
+      parameters:
+      - description: Post Title
+        in: path
+        name: title
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.postResponse'
+        "400":
+          description: invalid post title / failed to get post
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "401":
+          description: unauthorized
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "404":
+          description: post not found
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get post by title
+      tags:
+      - posts
+schemes:
+- http
+securityDefinitions:
+  BearerAuth:
+    description: 'Введите токен в формате: Bearer <ваш_токен>'
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
