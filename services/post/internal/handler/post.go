@@ -45,6 +45,10 @@ type postResponse struct {
 	CreatedAt interface{} `json:"created_at"`
 }
 
+type ErrorResponse struct {
+	Error string `json:"error"`
+}
+
 func newPostResponse(p *domain.Post) *postResponse {
 	return &postResponse{ID: p.ID, UserID: p.UserID, Title: p.Title, Content: p.Content, CreatedAt: p.CreatedAt}
 }

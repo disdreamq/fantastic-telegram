@@ -18,7 +18,6 @@ type AuthRequest struct {
 	Password string `json:"password" example:"password123"`
 }
 
-// AuthResponse represents the response body for login
 type AuthResponse struct {
 	Token        string      `json:"token"`
 	TokenPayload interface{} `json:"token_payload"`
@@ -28,7 +27,6 @@ func NewAuthResponse(res *domain.AuthResult) *AuthResponse {
 	return &AuthResponse{Token: res.Token, TokenPayload: res.TokenPayload}
 }
 
-// ErrorResponse represents a generic error response
 type ErrorResponse struct {
 	Error string `json:"error"`
 }

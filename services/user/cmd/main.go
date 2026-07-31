@@ -16,6 +16,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strconv"
 	"syscall"
 	"time"
 
@@ -127,7 +128,7 @@ func main() {
 	))
 
 	srv := &http.Server{
-		Addr:    ":8080",
+		Addr:    strconv.FormatInt(int64(cfg.HttpPort), 10),
 		Handler: r,
 	}
 

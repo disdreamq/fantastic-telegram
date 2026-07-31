@@ -42,8 +42,6 @@ func NewRouter(
 			r.Put("/{userID}", userCtrl.Update)
 			r.Delete("/{userID}", userCtrl.Delete)
 		})
-		r.Route("/posts", func(r chi.Router) {
-		})
 	})
 	return r
 }
