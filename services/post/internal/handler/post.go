@@ -1,3 +1,13 @@
+// Package handler Swagger documentation for the post service
+// @title          Post Service API
+// @version        1.0
+// @description    REST API для управления постами блога
+// @host           localhost:8080
+// @BasePath       /api/posts
+// @schemes        http
+// @securityDefinitions.apikey BearerAuth
+// @in                         header
+// @name                       Authorization
 package handler
 
 import (
@@ -27,7 +37,6 @@ type updatePostRequest struct {
 	Content string `json:"content"`
 }
 
-// postResponse represents a post in the response
 type postResponse struct {
 	ID        int64       `json:"id"`
 	UserID    int64       `json:"user_id"`
@@ -52,8 +61,8 @@ func NewPostController(postService port.PostService) *PostController {
 // @Accept       json
 // @Produce      json
 // @Security     BearerAuth
-// @Param        request  body      CreatePostRequest  true  "Post data"
-// @Success      201      {object}  PostResponse
+// @Param        request  body      createPostRequest  true  "Post data"
+// @Success      201      {object}  postResponse
 // @Failure      400      {object} ErrorResponse  "invalid JSON / invalid title or content"
 // @Failure      401      {object} ErrorResponse  "unauthorized"
 // @Failure      409      {object} ErrorResponse  "linked user with this id doesnt exists"
@@ -98,8 +107,9 @@ func (c *PostController) Create(w http.ResponseWriter, r *http.Request) {
 // @Tags         posts
 // @Accept       json
 // @Produce      json
+// @Security     BearerAuth
 // @Param        postID  path      int  true  "Post ID"
-// @Success      200     {object}  PostResponse
+// @Success      200     {object}  postResponse
 // @Failure      400     {object} ErrorResponse  "invalid post ID"
 // @Failure      401     {object} ErrorResponse  "unauthorized"
 // @Failure      404     {object} ErrorResponse  "post not found"
@@ -134,8 +144,9 @@ func (c *PostController) GetByID(w http.ResponseWriter, r *http.Request) {
 // @Tags         posts
 // @Accept       json
 // @Produce      json
+// @Security     BearerAuth
 // @Param        title   path      string  true  "Post Title"
-// @Success      200     {object}  PostResponse
+// @Success      200     {object}  postResponse
 // @Failure      400     {object} ErrorResponse  "invalid post title / failed to get post"
 // @Failure      401     {object} ErrorResponse  "unauthorized"
 // @Failure      404     {object} ErrorResponse  "post not found"
@@ -145,7 +156,7 @@ func (c *PostController) GetByTitle(w http.ResponseWriter, r *http.Request) {
 	title := chi.URLParam(r, "title")
 	decodedTitle, err := url.QueryUnescape(title)
 	if err != nil {
-		http.Error(w, `{"error": "invalid email encoding"}`, http.StatusBadRequest)
+		http.Error(w, `{"error": "invalid title encoding"}`, http.StatusBadRequest)
 		return
 	}
 	if title == "" {
@@ -176,7 +187,7 @@ func (c *PostController) GetByTitle(w http.ResponseWriter, r *http.Request) {
 // @Produce      json
 // @Security     BearerAuth
 // @Param        postID    path      int                true  "Post ID"
-// @Param        request   body      UpdatePostRequest  true  "Post data to update"
+// @Param        request   body      updatePostRequest  true  "Post data to update"
 // @Success      200       {string} string             "OK"
 // @Failure      400       {object} ErrorResponse      "invalid post ID / invalid JSON / invalid user ID"
 // @Failure      401       {object} ErrorResponse      "unauthorized"
