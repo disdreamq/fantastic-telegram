@@ -128,7 +128,7 @@ func main() {
 	))
 
 	srv := &http.Server{
-		Addr:    strconv.FormatInt(int64(cfg.HttpPort), 10),
+		Addr:    ":" + strconv.FormatInt(int64(cfg.HttpPort), 10),
 		Handler: r,
 	}
 
