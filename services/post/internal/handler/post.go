@@ -214,7 +214,7 @@ func (c *PostController) Update(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		switch err {
 		case service.ErrPostNotFound:
-			http.Error(w, `{"error": "user not found"}`, http.StatusNotFound)
+			http.Error(w, `{"error": "post not found"}`, http.StatusNotFound)
 			return
 		default:
 			http.Error(w, `{"error": "failed to get post"}`, http.StatusBadRequest)
