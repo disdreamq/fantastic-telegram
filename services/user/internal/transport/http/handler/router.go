@@ -29,6 +29,8 @@ func NewRouter(
 		r.Use(middleware.NewRateLimitMiddleware(rdb, PublicRPM).Limit)
 		r.Post("/register", userCtrl.Create)
 		r.Post("/login", authCtrl.Login)
+		r.Get("/users/{userID}", userCtrl.GetByID)
+		r.Get("/users/email/{email}", userCtrl.GetByEmail)
 	})
 
 	// Protected routes
@@ -37,8 +39,6 @@ func NewRouter(
 		r.Use(middleware.NewAuthMiddleware(jwt.NewProvider(secret, expiry)).Authenticate)
 
 		r.Route("/users", func(r chi.Router) {
-			r.Get("/id/{userID}", userCtrl.GetByID)
-			r.Get("/email/{email}", userCtrl.GetByEmail)
 			r.Put("/{userID}", userCtrl.Update)
 			r.Delete("/{userID}", userCtrl.Delete)
 		})
