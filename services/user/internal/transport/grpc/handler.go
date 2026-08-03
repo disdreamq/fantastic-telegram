@@ -30,3 +30,7 @@ func (s *userServer) ValidateToken(ctx context.Context, in *pb.ValidateTokenRequ
 	}
 	return &pb.ValidateTokenResponse{Valid: true, UserID: payload.Claims.UserID, UserEmail: payload.Claims.Email}, nil
 }
+
+func NewUserServer(p port.TokenProvider) pb.UserServiceServer {
+	return &userServer{p: p}
+}
