@@ -173,6 +173,7 @@ func (c *UserController) GetByEmail(w http.ResponseWriter, r *http.Request) {
 // @Success      200       {string} string               "OK"
 // @Failure      400       {object} ErrorResponse        "invalid user ID / invalid JSON"
 // @Failure      401       {object} ErrorResponse        "unauthorized"
+// @Failure      405     {object} ErrorResponse  "method not allowed"
 // @Failure      404       {object} ErrorResponse        "user not found"
 // @Failure      500       {object} ErrorResponse        "failed to get user"
 // @Router       /users/{userID} [put]
@@ -209,6 +210,9 @@ func (c *UserController) Update(w http.ResponseWriter, r *http.Request) {
 		case service.ErrUserNotFound:
 			http.Error(w, `{"error": "user not found"}`, http.StatusNotFound)
 			return
+		case service.ErrMethodNotAllowed:
+			http.Error(w, `{"error": "failed to update user"}`, http.StatusMethodNotAllowed)
+			return
 		default:
 			http.Error(w, `{"error": "failed to get user"}`, http.StatusBadRequest)
 			return
@@ -230,6 +234,7 @@ func (c *UserController) Update(w http.ResponseWriter, r *http.Request) {
 // @Failure      400     {object} ErrorResponse  "invalid user ID"
 // @Failure      401     {object} ErrorResponse  "unauthorized"
 // @Failure      404     {object} ErrorResponse  "user not found"
+// @Failure      405     {object} ErrorResponse  "method not allowed"
 // @Failure      500     {object} ErrorResponse  "failed to get user"
 // @Router       /users/{userID} [delete]
 func (c *UserController) Delete(w http.ResponseWriter, r *http.Request) {
@@ -255,6 +260,9 @@ func (c *UserController) Delete(w http.ResponseWriter, r *http.Request) {
 		switch err {
 		case service.ErrUserNotFound:
 			http.Error(w, `{"error": "user not found"}`, http.StatusNotFound)
+			return
+		case service.ErrMethodNotAllowed:
+			http.Error(w, `{"error": "failed to delete user"}`, http.StatusMethodNotAllowed)
 			return
 		default:
 			http.Error(w, `{"error": "failed to get user"}`, http.StatusBadRequest)
