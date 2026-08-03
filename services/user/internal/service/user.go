@@ -19,18 +19,36 @@ func NewUserService(userRepo port.UserRepository, hasher port.Hasher) *UserServi
 }
 
 func (u *UserService) Create(ctx context.Context, username, email, password string) (*domain.User, error) {
+	logger := log.Ctx(ctx)
+	trace_id, _ := ctx.Value("trace_id").(string)
+
 	passwordHash, err := processPassword(password, u.hasher)
 	if err != nil {
+		logger.Error().
+			Err(err).
+			Str("trace_id", trace_id).
+			Str("email", email).
+			Msg("Create user error in user service.")
 		return nil, err
 	}
 
 	domainUser, err := domain.NewUser(username, email, passwordHash)
 	if err != nil {
+		logger.Error().
+			Err(err).
+			Str("trace_id", trace_id).
+			Str("email", email).
+			Msg("Create user error in user service.")
 		return nil, err
 	}
 
 	user, err := u.userRepo.Create(ctx, domainUser)
 	if err != nil {
+		logger.Error().
+			Err(err).
+			Str("trace_id", trace_id).
+			Str("email", email).
+			Msg("Create user error in user service.")
 		switch err {
 		case sql.ErrNoRows:
 			return nil, ErrUserAlreadyExists
@@ -39,8 +57,6 @@ func (u *UserService) Create(ctx context.Context, username, email, password stri
 		}
 
 	}
-	logger := log.Ctx(ctx)
-	trace_id, _ := ctx.Value("trace_id").(string)
 	logger.Info().
 		Str("trace_id", trace_id).
 		Int64("userId", user.ID).
@@ -70,8 +86,15 @@ func (u *UserService) GetByID(ctx context.Context, userID int64) (*domain.User, 
 }
 
 func (u *UserService) GetByEmail(ctx context.Context, email string) (*domain.User, error) {
+	logger := log.Ctx(ctx)
+	trace_id, _ := ctx.Value("trace_id").(string)
 	user, err := u.userRepo.GetByEmail(ctx, email)
 	if err != nil {
+		logger.Error().
+			Err(err).
+			Str("trace_id", trace_id).
+			Str("email", email).
+			Msg("Read user by email error in user service.")
 		switch err {
 		case sql.ErrNoRows:
 			return nil, ErrUserNotFound
@@ -79,8 +102,6 @@ func (u *UserService) GetByEmail(ctx context.Context, email string) (*domain.Use
 			return nil, ErrUnexpected
 		}
 	}
-	logger := log.Ctx(ctx)
-	trace_id, _ := ctx.Value("trace_id").(string)
 	logger.Debug().
 		Str("trace_id", trace_id).
 		Str("title", email).
@@ -89,19 +110,40 @@ func (u *UserService) GetByEmail(ctx context.Context, email string) (*domain.Use
 }
 
 func (u *UserService) Update(ctx context.Context, currUserID, userID int64, username, email, password string) error {
+	logger := log.Ctx(ctx)
+	trace_id, _ := ctx.Value("trace_id").(string)
+
 	if ok := u.validateCurrUser(ctx, currUserID, userID); !ok {
 		return ErrMethodNotAllowed
 	}
 	passwordHash, err := processPassword(password, u.hasher)
 	if err != nil {
+		logger.Error().
+			Err(err).
+			Str("trace_id", trace_id).
+			Int64("user_id", userID).
+			Str("email", email).
+			Msg("Update user error in user service.")
 		return err
 	}
-	domainUser, err := domain.NewUser(username, email, passwordHash)
+	user, err := domain.NewUser(username, email, passwordHash)
 	if err != nil {
+		logger.Error().
+			Err(err).
+			Str("trace_id", trace_id).
+			Int64("user_id", userID).
+			Str("email", email).
+			Msg("Update user error in user service.")
 		return err
 	}
-	err = u.userRepo.Update(ctx, domainUser)
+	user.ID = userID
+	err = u.userRepo.Update(ctx, user)
 	if err != nil {
+		logger.Error().
+			Err(err).
+			Str("trace_id", trace_id).
+			Str("email", email).
+			Msg("Update user error in user service.")
 		switch err {
 		case sql.ErrNoRows:
 			return ErrUserNotFound
@@ -111,8 +153,6 @@ func (u *UserService) Update(ctx context.Context, currUserID, userID int64, user
 			return ErrUnexpected
 		}
 	}
-	logger := log.Ctx(ctx)
-	trace_id, _ := ctx.Value("trace_id").(string)
 	logger.Debug().
 		Str("trace_id", trace_id).
 		Int64("user_id", userID).
@@ -123,11 +163,19 @@ func (u *UserService) Update(ctx context.Context, currUserID, userID int64, user
 }
 
 func (u *UserService) Delete(ctx context.Context, currUserID int64, userID int64) error {
+	logger := log.Ctx(ctx)
+	trace_id, _ := ctx.Value("trace_id").(string)
+
 	if ok := u.validateCurrUser(ctx, currUserID, userID); !ok {
 		return ErrMethodNotAllowed
 	}
 	err := u.userRepo.Delete(ctx, userID)
 	if err != nil {
+		logger.Error().
+			Err(err).
+			Str("trace_id", trace_id).
+			Int64("user_id", userID).
+			Msg("Delete user error in user service.")
 		switch err {
 		case sql.ErrNoRows:
 			return ErrUserNotFound
@@ -137,8 +185,6 @@ func (u *UserService) Delete(ctx context.Context, currUserID int64, userID int64
 			return ErrUnexpected
 		}
 	}
-	logger := log.Ctx(ctx)
-	trace_id, _ := ctx.Value("trace_id").(string)
 	logger.Debug().
 		Str("trace_id", trace_id).
 		Int64("user_id", userID).
@@ -157,7 +203,6 @@ func (u *UserService) validateCurrUser(ctx context.Context, currUserID, userID i
 			Msg("Validation failed for user.")
 		return false
 	}
-
 	logger.Debug().
 		Str("trace_id", trace_id).
 		Int64("current_user_id", currUserID).
