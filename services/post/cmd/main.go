@@ -71,7 +71,7 @@ func main() {
 
 	// Swagger
 	r.Get("/swagger/*", httpSwagger.Handler(
-		httpSwagger.URL("http://localhost:8080/swagger/doc.json"),
+		httpSwagger.URL("http://localhost:"+strconv.FormatInt(int64(cfg.HttpPort), 10)+"/swagger/doc.json"),
 	))
 
 	// Start server
