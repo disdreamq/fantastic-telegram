@@ -177,6 +177,42 @@ paths:
       summary: Delete a user
       tags:
       - users
+    get:
+      consumes:
+      - application/json
+      description: Returns a single user by their ID
+      parameters:
+      - description: User ID
+        in: path
+        name: userID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.userResponse'
+        "400":
+          description: invalid user ID
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "401":
+          description: unauthorized
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "404":
+          description: user not found
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "500":
+          description: failed to get user
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      summary: Get user by ID
+      tags:
+      - users
     put:
       consumes:
       - application/json
@@ -225,7 +261,7 @@ paths:
     get:
       consumes:
       - application/json
-      description: Returns a single user by their email (requires authentication)
+      description: Returns a single user by their email
       parameters:
       - description: User Email
         in: path
@@ -251,48 +287,7 @@ paths:
           description: user not found
           schema:
             $ref: '#/definitions/handler.ErrorResponse'
-      security:
-      - BearerAuth: []
       summary: Get user by email
-      tags:
-      - users
-  /users/id/{userID}:
-    get:
-      consumes:
-      - application/json
-      description: Returns a single user by their ID (requires authentication)
-      parameters:
-      - description: User ID
-        in: path
-        name: userID
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/handler.userResponse'
-        "400":
-          description: invalid user ID
-          schema:
-            $ref: '#/definitions/handler.ErrorResponse'
-        "401":
-          description: unauthorized
-          schema:
-            $ref: '#/definitions/handler.ErrorResponse'
-        "404":
-          description: user not found
-          schema:
-            $ref: '#/definitions/handler.ErrorResponse'
-        "500":
-          description: failed to get user
-          schema:
-            $ref: '#/definitions/handler.ErrorResponse'
-      security:
-      - BearerAuth: []
-      summary: Get user by ID
       tags:
       - users
 schemes:
