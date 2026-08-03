@@ -13,6 +13,7 @@ package main
 
 import (
 	"context"
+	"net"
 	"net/http"
 	"os"
 	"os/signal"
@@ -26,9 +27,12 @@ import (
 	"github.com/disdreamq/fantastic-telegram/services/user/internal/infra/jwt"
 	"github.com/disdreamq/fantastic-telegram/services/user/internal/repository/postgres"
 	"github.com/disdreamq/fantastic-telegram/services/user/internal/repository/redis"
+	gr "github.com/disdreamq/fantastic-telegram/services/user/internal/transport/grpc"
+	"google.golang.org/grpc"
 
 	"github.com/disdreamq/fantastic-telegram/services/user/internal/service"
 	"github.com/disdreamq/fantastic-telegram/services/user/internal/transport/http/handler"
+	pb "github.com/disdreamq/fantastic-telegram/services/user/proto"
 	"github.com/fatih/color"
 
 	"github.com/joho/godotenv"
@@ -137,17 +141,28 @@ func main() {
 		httpSwagger.URL("http://localhost:8080/swagger/doc.json"),
 	))
 
-	srv := &http.Server{
+	httpSrv := &http.Server{
 		Addr:    ":" + strconv.FormatInt(int64(cfg.HttpPort), 10),
 		Handler: r,
 	}
+	grpcSrv := grpc.NewServer()
 
 	go func() {
-		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+		if err := httpSrv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			logger.Fatal().
 				Err(err).
 				Msg("Critical error during starting server")
 		}
+	}()
+	go func() {
+		l, err := net.Listen("tcp", ":"+strconv.FormatInt(int64(cfg.GrpcPort), 10))
+		if err != nil {
+			logger.Fatal().
+				Err(err).
+				Msg("Critical error during starting server")
+		}
+		pb.RegisterUserServiceServer(grpcSrv, gr.NewUserServer(jwt.NewProvider(cfg.SecretKey, time.Duration(cfg.Expiry))))
+		grpcSrv.Serve(l)
 	}()
 
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
@@ -160,11 +175,12 @@ func main() {
 	logger.Info().Msg("Shutting down")
 	shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-	if err := srv.Shutdown(shutdownCtx); err != nil {
+	if err := httpSrv.Shutdown(shutdownCtx); err != nil {
 		logger.Fatal().
 			Err(err).
 			Msg("Server shutdown failed")
 	}
+	grpcSrv.GracefulStop()
 	DB.Close()
 	rdb.Close()
 
