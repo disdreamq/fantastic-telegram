@@ -30,11 +30,9 @@ func NewRouter(
 	r.Group(func(r chi.Router) {
 		r.Use(middleware.NewRateLimitMiddleware(rdb, protectedPRM).Limit)
 		r.Use(middleware.NewAuthMiddleware(grpcClient).Authenticate)
-	})
-	r.Route("/posts", func(r chi.Router) {
-		r.Post("/", postCtrl.Create)
-		r.Put("/{postID}", postCtrl.Update)
-		r.Delete("/{postID}", postCtrl.Delete)
+		r.Post("/posts/", postCtrl.Create)
+		r.Put("/posts/{postID}", postCtrl.Update)
+		r.Delete("/posts/{postID}", postCtrl.Delete)
 	})
 	return r
 }
