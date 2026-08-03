@@ -63,16 +63,20 @@ services:
     - 1.1.1.1
     container_name: post_service
     restart: unless-stopped
-    ports:
-      - "8080:8080"
     env_file:
       - ./.env
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      REDIS_URL: redis://:${REDIS_PASSWORD}@${REDIS_HOST}:${REDIS_PORT}/${REDIS_DB:-0}
-      HTTP_PORT: ${HTTP_PORT}
+      REDIS_DATABASE: ${REDIS_DATABASE}
+      REDIS_HOST: ${REDIS_HOST}
+      REDIS_PORT: ${REDIS_PORT}
+      REDIS_USERNAME: ${REDIS_USERNAME}
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      POST_HTTP_PORT: ${POST_HTTP_PORT}
+    ports:
+     - "${POST_HTTP_PORT}:${POST_HTTP_PORT}"
     depends_on:
       postgres:
         condition: service_healthy
@@ -92,17 +96,22 @@ services:
     - 1.1.1.1
     container_name: user_service
     restart: unless-stopped
-    ports:
-      - "8080:8080"
     env_file:
       - ./.env
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      REDIS_URL: redis://:${REDIS_PASSWORD}@${REDIS_HOST}:${REDIS_PORT}/${REDIS_DB:-0}
-      HTTP_PORT: ${HTTP_PORT}
+      REDIS_DATABASE: ${REDIS_DATABASE}
+      REDIS_HOST: ${REDIS_HOST}
+      REDIS_PORT: ${REDIS_PORT}
+      REDIS_USERNAME: ${REDIS_USERNAME}
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      POST_HTTP_PORT: ${POST_HTTP_PORT}
+      HTTP_PORT: ${USER_HTTP_PORT}
       GRPC_PORT: ${GRPC_PORT}
+    ports:
+     - "${USER_HTTP_PORT}:${USER_HTTP_PORT}"
     depends_on:
       postgres:
         condition: service_healthy
