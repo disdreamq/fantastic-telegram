@@ -48,8 +48,6 @@ func printBanner(cfg *config.Config) {
    \ \__\   \ \__\ \__\ \__\\ \__\   \ \__\ \ \__\ \__\____\_\  \   \ \__\ \ \__\ \_______\
     \|__|    \|__|\|__|\|__| \|__|    \|__|  \|__|\|__|\_________\   \|__|  \|__|\|_______|
                                                       \|_________|                         
-                                                                                           
-                                                                                           
  _________  _______   ___       _______   ________  ________  ________  _____ ______       
 |\___   ___\\  ___ \ |\  \     |\  ___ \ |\   ____\|\   __  \|\   __  \|\   _ \  _   \     
 \|___ \  \_\ \   __/|\ \  \    \ \   __/|\ \  \___|\ \  \|\  \ \  \|\  \ \  \\\__\ \  \    
@@ -74,7 +72,6 @@ func printBanner(cfg *config.Config) {
 	white.Printf("   JWT Expiry:  %s\n", time.Duration(cfg.Expiry).String())
 	white.Printf("   Rate Limit:  Public=%d RPM, Protected=%d RPM\n", cfg.PublicRPM, cfg.ProtectedRPM)
 	println()
-
 	green.Println("Services:")
 	green.Println("   ✓ PostgreSQL connected")
 	green.Println("   ✓ Redis connected")
@@ -83,21 +80,22 @@ func printBanner(cfg *config.Config) {
 	green.Println("   ✓ Logging middleware enabled")
 	green.Println("   ✓ Recovery middleware enabled")
 	println()
-
-	magenta.Println("Endpoints:")
+	magenta.Println("User URLs:")
 	white.Printf("   API Base:     http://localhost:%d/\n", http_port)
 	white.Printf("   Swagger:      http://localhost:%d/swagger/\n", http_port)
 	white.Printf("   Swagger JSON: http://localhost:%d/swagger/doc.json\n", http_port)
 	println()
-
-	yellow.Println("🚀 Server is running! Press CTRL+C to stop.")
+	magenta.Println("Post URLs:")
+	white.Printf("   API Base:     http://localhost:%d/\n", 8081)
+	white.Printf("   Swagger:      http://localhost:%d/swagger/\n", 8081)
+	white.Printf("   Swagger JSON: http://localhost:%d/swagger/doc.json\n", 8081)
 }
 
 func main() {
 
 	// Logging
 	logger := zerolog.New(os.Stdout).With().Timestamp().Logger().Output(zerolog.ConsoleWriter{Out: os.Stdout})
-	zerolog.SetGlobalLevel(zerolog.InfoLevel)
+	zerolog.SetGlobalLevel(zerolog.DebugLevel)
 	logger.Info().Msg("Starting the application.")
 
 	// Load cfg
