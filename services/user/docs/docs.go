@@ -133,12 +133,7 @@ const docTemplate = `{
         },
         "/users/email/{email}": {
             "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Returns a single user by their email (requires authentication)",
+                "description": "Returns a single user by their email",
                 "consumes": [
                     "application/json"
                 ],
@@ -186,14 +181,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/users/id/{userID}": {
+        "/users/{userID}": {
             "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Returns a single user by their ID (requires authentication)",
+                "description": "Returns a single user by their ID",
                 "consumes": [
                     "application/json"
                 ],
@@ -245,9 +235,7 @@ const docTemplate = `{
                         }
                     }
                 }
-            }
-        },
-        "/users/{userID}": {
+            },
             "put": {
                 "security": [
                     {
