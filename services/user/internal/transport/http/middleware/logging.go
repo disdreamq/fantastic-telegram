@@ -13,6 +13,7 @@ type responseWriter struct {
 	http.ResponseWriter
 	status int
 	size   int
+	body   []byte
 }
 
 func (rw *responseWriter) WriteHeader(code int) {
@@ -24,6 +25,7 @@ func (rw *responseWriter) Write(b []byte) (int, error) {
 	if rw.status == 0 {
 		rw.status = http.StatusOK
 	}
+	rw.body = append(rw.body, b...)
 	n, err := rw.ResponseWriter.Write(b)
 	rw.size += n
 	return n, err
@@ -51,14 +53,33 @@ func LoggingMiddleware(logger zerolog.Logger) func(http.Handler) http.Handler {
 
 			duration := time.Since(start)
 
-			logger.Info().
-				Str("trace_id", traceID).
-				Str("method", r.Method).
-				Str("path", r.URL.Path).
-				Int("status", rw.status).
-				Dur("duration", duration).
-				Str("remote_addr", r.RemoteAddr).
-				Msg("HTTP request")
+			if rw.status >= 500 {
+				logger.Error().
+					Str("trace_id", traceID).
+					Str("method", r.Method).
+					Str("path", r.URL.Path).
+					Int("status", rw.status).
+					Dur("duration", duration).
+					Str("response_body", string(rw.body)).
+					Msg("Request failed")
+			} else if rw.status >= 400 {
+				logger.Warn().
+					Str("trace_id", traceID).
+					Str("method", r.Method).
+					Str("path", r.URL.Path).
+					Int("status", rw.status).
+					Str("response_body", string(rw.body)).
+					Msg("Request failed")
+			} else {
+				logger.Info().
+					Str("trace_id", traceID).
+					Str("method", r.Method).
+					Str("path", r.URL.Path).
+					Int("status", rw.status).
+					Dur("duration", duration).
+					Str("remote_addr", r.RemoteAddr).
+					Msg("HTTP request")
+			}
 		})
 	}
 }
