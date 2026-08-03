@@ -296,6 +296,12 @@ const docTemplate = `{
                             "$ref": "#/definitions/handler.ErrorResponse"
                         }
                     },
+                    "405": {
+                        "description": "method not allowed",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ErrorResponse"
+                        }
+                    },
                     "500": {
                         "description": "failed to get user",
                         "schema": {
@@ -351,6 +357,12 @@ const docTemplate = `{
                     },
                     "404": {
                         "description": "user not found",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ErrorResponse"
+                        }
+                    },
+                    "405": {
+                        "description": "method not allowed",
                         "schema": {
                             "$ref": "#/definitions/handler.ErrorResponse"
                         }
