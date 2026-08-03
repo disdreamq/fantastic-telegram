@@ -91,18 +91,17 @@ func (c *UserController) Create(w http.ResponseWriter, r *http.Request) {
 
 // GetByID retrieves a user by their ID
 // @Summary      Get user by ID
-// @Description  Returns a single user by their ID (requires authentication)
+// @Description  Returns a single user by their ID
 // @Tags         users
 // @Accept       json
 // @Produce      json
-// @Security     BearerAuth
 // @Param        userID  path      int  true  "User ID"
 // @Success      200     {object}  userResponse
 // @Failure      400     {object}  ErrorResponse  "invalid user ID"
 // @Failure      401     {object}  ErrorResponse  "unauthorized"
 // @Failure      404     {object}  ErrorResponse  "user not found"
 // @Failure      500     {object}  ErrorResponse  "failed to get user"
-// @Router       /users/id/{userID} [get]
+// @Router       /users/{userID} [get]
 func (c *UserController) GetByID(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	userID, err := strconv.ParseInt(chi.URLParam(r, "userID"), 10, 64)
@@ -128,11 +127,10 @@ func (c *UserController) GetByID(w http.ResponseWriter, r *http.Request) {
 
 // GetByEmail retrieves a user by their email
 // @Summary      Get user by email
-// @Description  Returns a single user by their email (requires authentication)
+// @Description  Returns a single user by their email
 // @Tags         users
 // @Accept       json
 // @Produce      json
-// @Security     BearerAuth
 // @Param        email  path      string  true  "User Email"
 // @Success      200    {object}  userResponse
 // @Failure      400    {object}  ErrorResponse  "failed to get user"
@@ -190,9 +188,19 @@ func (c *UserController) Update(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, `{"error": "invalid user ID"}`, http.StatusBadRequest)
 		return
 	}
-	currUserID, err := strconv.ParseInt(r.Context().Value("userID").(string), 10, 64)
-	if err != nil {
-		http.Error(w, `{"error": "invalid user ID"}`, http.StatusBadRequest)
+	val := r.Context().Value("userID")
+	if val == nil {
+		http.Error(w, `{"error": "unauthorized"}`, http.StatusUnauthorized)
+		return
+	}
+	var currUserID int64
+	switch v := val.(type) {
+	case int:
+		currUserID = int64(v)
+	case int64:
+		currUserID = v
+	default:
+		http.Error(w, `{"error": "invalid user ID type"}`, http.StatusInternalServerError)
 		return
 	}
 	err = c.userService.Update(r.Context(), currUserID, userID, userReq.Username, userReq.Email, userReq.Password)
@@ -231,9 +239,15 @@ func (c *UserController) Delete(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, `{"error": "invalid user ID"}`, http.StatusBadRequest)
 		return
 	}
-	currUserID, err := strconv.ParseInt(r.Context().Value("userID").(string), 10, 64)
-	if err != nil {
-		http.Error(w, `{"error": "invalid user ID"}`, http.StatusBadRequest)
+	val := r.Context().Value("userID")
+	var currUserID int64
+	switch v := val.(type) {
+	case int:
+		currUserID = int64(v)
+	case int64:
+		currUserID = v
+	default:
+		http.Error(w, `{"error": "invalid user ID type"}`, http.StatusInternalServerError)
 		return
 	}
 	err = c.userService.Delete(r.Context(), currUserID, userID)
@@ -241,8 +255,10 @@ func (c *UserController) Delete(w http.ResponseWriter, r *http.Request) {
 		switch err {
 		case service.ErrUserNotFound:
 			http.Error(w, `{"error": "user not found"}`, http.StatusNotFound)
+			return
 		default:
 			http.Error(w, `{"error": "failed to get user"}`, http.StatusBadRequest)
+			return
 		}
 	}
 	w.Header().Set("Content-Type", "application/json")
