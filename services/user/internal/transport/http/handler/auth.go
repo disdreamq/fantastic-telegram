@@ -20,8 +20,11 @@ type AuthRequest struct {
 
 type AuthResponse struct {
 	Token        string      `json:"token"`
-	TokenPayload interface{} `json:"token_payload"`
+	TokenPayload any         `json:"token_payload"`
 }
+
+// @Param        request  body      AuthRequest  true  "Login credentials"
+// @Success      200      {object}  AuthResponse
 
 func NewAuthResponse(res *domain.AuthResult) *AuthResponse {
 	return &AuthResponse{Token: res.Token, TokenPayload: res.TokenPayload}

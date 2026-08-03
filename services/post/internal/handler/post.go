@@ -3,7 +3,7 @@
 // @version        1.0
 // @description    REST API для управления постами блога
 // @host           localhost:8080
-// @BasePath       /api/posts
+// @BasePath       /
 // @schemes        http
 // @securityDefinitions.apikey BearerAuth
 // @in                         header
@@ -107,15 +107,13 @@ func (c *PostController) Create(w http.ResponseWriter, r *http.Request) {
 
 // GetByID retrieves a post by its ID
 // @Summary      Get post by ID
-// @Description  Returns a single post by its ID (requires authentication)
+// @Description  Returns a single post by its ID (public endpoint, no authentication required)
 // @Tags         posts
 // @Accept       json
 // @Produce      json
-// @Security     BearerAuth
 // @Param        postID  path      int  true  "Post ID"
 // @Success      200     {object}  postResponse
 // @Failure      400     {object} ErrorResponse  "invalid post ID"
-// @Failure      401     {object} ErrorResponse  "unauthorized"
 // @Failure      404     {object} ErrorResponse  "post not found"
 // @Failure      500     {object} ErrorResponse  "failed to get post"
 // @Router       /posts/id/{postID} [get]
@@ -144,15 +142,13 @@ func (c *PostController) GetByID(w http.ResponseWriter, r *http.Request) {
 
 // GetByTitle retrieves a post by its title
 // @Summary      Get post by title
-// @Description  Returns a single post by its title (requires authentication)
+// @Description  Returns a single post by its title (public endpoint, no authentication required)
 // @Tags         posts
 // @Accept       json
 // @Produce      json
-// @Security     BearerAuth
 // @Param        title   path      string  true  "Post Title"
 // @Success      200     {object}  postResponse
 // @Failure      400     {object} ErrorResponse  "invalid post title / failed to get post"
-// @Failure      401     {object} ErrorResponse  "unauthorized"
 // @Failure      404     {object} ErrorResponse  "post not found"
 // @Router       /posts/title/{title} [get]
 func (c *PostController) GetByTitle(w http.ResponseWriter, r *http.Request) {

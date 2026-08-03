@@ -105,13 +105,7 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "invalid JSON",
-                        "schema": {
-                            "$ref": "#/definitions/handler.ErrorResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "user not found",
+                        "description": "invalid JSON / failed to create user",
                         "schema": {
                             "$ref": "#/definitions/handler.ErrorResponse"
                         }
@@ -211,25 +205,13 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "invalid user ID",
-                        "schema": {
-                            "$ref": "#/definitions/handler.ErrorResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "unauthorized",
+                        "description": "invalid user ID / failed to get user",
                         "schema": {
                             "$ref": "#/definitions/handler.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "user not found",
-                        "schema": {
-                            "$ref": "#/definitions/handler.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "failed to get user",
                         "schema": {
                             "$ref": "#/definitions/handler.ErrorResponse"
                         }

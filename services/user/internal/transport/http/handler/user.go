@@ -58,9 +58,8 @@ func NewUserController(userService port.UserService) *UserController {
 // @Produce      json
 // @Param        request  body      createUserRequest  true  "User registration data"
 // @Success      201      {object}  userResponse
-// @Failure      400      {object}  ErrorResponse  "invalid JSON"
+// @Failure      400      {object}  ErrorResponse  "invalid JSON / failed to create user"
 // @Failure      409      {object}  ErrorResponse  "user with this email already exists"
-// @Failure      404      {object}  ErrorResponse  "user not found"
 // @Failure      500      {object}  ErrorResponse  "failed to create user"
 // @Router       /register [post]
 func (c *UserController) Create(w http.ResponseWriter, r *http.Request) {
@@ -97,10 +96,8 @@ func (c *UserController) Create(w http.ResponseWriter, r *http.Request) {
 // @Produce      json
 // @Param        userID  path      int  true  "User ID"
 // @Success      200     {object}  userResponse
-// @Failure      400     {object}  ErrorResponse  "invalid user ID"
-// @Failure      401     {object}  ErrorResponse  "unauthorized"
+// @Failure      400     {object}  ErrorResponse  "invalid user ID / failed to get user"
 // @Failure      404     {object}  ErrorResponse  "user not found"
-// @Failure      500     {object}  ErrorResponse  "failed to get user"
 // @Router       /users/{userID} [get]
 func (c *UserController) GetByID(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()

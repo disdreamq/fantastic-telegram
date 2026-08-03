@@ -80,12 +80,7 @@ const docTemplate = `{
         },
         "/posts/id/{postID}": {
             "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Returns a single post by its ID (requires authentication)",
+                "description": "Returns a single post by its ID (public endpoint, no authentication required)",
                 "consumes": [
                     "application/json"
                 ],
@@ -118,12 +113,6 @@ const docTemplate = `{
                             "$ref": "#/definitions/handler.ErrorResponse"
                         }
                     },
-                    "401": {
-                        "description": "unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/handler.ErrorResponse"
-                        }
-                    },
                     "404": {
                         "description": "post not found",
                         "schema": {
@@ -141,12 +130,7 @@ const docTemplate = `{
         },
         "/posts/title/{title}": {
             "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Returns a single post by its title (requires authentication)",
+                "description": "Returns a single post by its title (public endpoint, no authentication required)",
                 "consumes": [
                     "application/json"
                 ],
@@ -175,12 +159,6 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "invalid post title / failed to get post",
-                        "schema": {
-                            "$ref": "#/definitions/handler.ErrorResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "unauthorized",
                         "schema": {
                             "$ref": "#/definitions/handler.ErrorResponse"
                         }

@@ -167,7 +167,8 @@ paths:
     get:
       consumes:
       - application/json
-      description: Returns a single post by its ID (requires authentication)
+      description: Returns a single post by its ID (public endpoint, no authentication
+        required)
       parameters:
       - description: Post ID
         in: path
@@ -185,10 +186,6 @@ paths:
           description: invalid post ID
           schema:
             $ref: '#/definitions/handler.ErrorResponse'
-        "401":
-          description: unauthorized
-          schema:
-            $ref: '#/definitions/handler.ErrorResponse'
         "404":
           description: post not found
           schema:
@@ -197,8 +194,6 @@ paths:
           description: failed to get post
           schema:
             $ref: '#/definitions/handler.ErrorResponse'
-      security:
-      - BearerAuth: []
       summary: Get post by ID
       tags:
       - posts
@@ -206,7 +201,8 @@ paths:
     get:
       consumes:
       - application/json
-      description: Returns a single post by its title (requires authentication)
+      description: Returns a single post by its title (public endpoint, no authentication
+        required)
       parameters:
       - description: Post Title
         in: path
@@ -224,16 +220,10 @@ paths:
           description: invalid post title / failed to get post
           schema:
             $ref: '#/definitions/handler.ErrorResponse'
-        "401":
-          description: unauthorized
-          schema:
-            $ref: '#/definitions/handler.ErrorResponse'
         "404":
           description: post not found
           schema:
             $ref: '#/definitions/handler.ErrorResponse'
-      security:
-      - BearerAuth: []
       summary: Get post by title
       tags:
       - posts
