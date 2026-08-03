@@ -1,7 +1,7 @@
 // @title           Blog API
 // @version         1.0
 // @description     REST API для блога с авторизацией, управлением пользователями и постами
-// @host            localhost:8080
+// @host            localhost:8081
 // @BasePath        /
 // @schemes         http
 // @securityDefinitions.apikey BearerAuth

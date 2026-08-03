@@ -40,7 +40,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/handler.createPostRequest"
+                            "$ref": "#/definitions/internal_handler.createPostRequest"
                         }
                     }
                 ],
@@ -48,31 +48,31 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/handler.postResponse"
+                            "$ref": "#/definitions/internal_handler.postResponse"
                         }
                     },
                     "400": {
                         "description": "invalid JSON / invalid title or content",
                         "schema": {
-                            "$ref": "#/definitions/handler.ErrorResponse"
+                            "$ref": "#/definitions/internal_handler.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/handler.ErrorResponse"
+                            "$ref": "#/definitions/internal_handler.ErrorResponse"
                         }
                     },
                     "409": {
                         "description": "linked user with this id doesnt exists",
                         "schema": {
-                            "$ref": "#/definitions/handler.ErrorResponse"
+                            "$ref": "#/definitions/internal_handler.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "failed to create post",
                         "schema": {
-                            "$ref": "#/definitions/handler.ErrorResponse"
+                            "$ref": "#/definitions/internal_handler.ErrorResponse"
                         }
                     }
                 }
@@ -104,25 +104,25 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/handler.postResponse"
+                            "$ref": "#/definitions/internal_handler.postResponse"
                         }
                     },
                     "400": {
                         "description": "invalid post ID",
                         "schema": {
-                            "$ref": "#/definitions/handler.ErrorResponse"
+                            "$ref": "#/definitions/internal_handler.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "post not found",
                         "schema": {
-                            "$ref": "#/definitions/handler.ErrorResponse"
+                            "$ref": "#/definitions/internal_handler.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "failed to get post",
                         "schema": {
-                            "$ref": "#/definitions/handler.ErrorResponse"
+                            "$ref": "#/definitions/internal_handler.ErrorResponse"
                         }
                     }
                 }
@@ -154,19 +154,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/handler.postResponse"
+                            "$ref": "#/definitions/internal_handler.postResponse"
                         }
                     },
                     "400": {
                         "description": "invalid post title / failed to get post",
                         "schema": {
-                            "$ref": "#/definitions/handler.ErrorResponse"
+                            "$ref": "#/definitions/internal_handler.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "post not found",
                         "schema": {
-                            "$ref": "#/definitions/handler.ErrorResponse"
+                            "$ref": "#/definitions/internal_handler.ErrorResponse"
                         }
                     }
                 }
@@ -204,7 +204,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/handler.updatePostRequest"
+                            "$ref": "#/definitions/internal_handler.updatePostRequest"
                         }
                     }
                 ],
@@ -218,25 +218,25 @@ const docTemplate = `{
                     "400": {
                         "description": "invalid post ID / invalid JSON / invalid user ID",
                         "schema": {
-                            "$ref": "#/definitions/handler.ErrorResponse"
+                            "$ref": "#/definitions/internal_handler.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/handler.ErrorResponse"
+                            "$ref": "#/definitions/internal_handler.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "user not found",
                         "schema": {
-                            "$ref": "#/definitions/handler.ErrorResponse"
+                            "$ref": "#/definitions/internal_handler.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "failed to get post",
                         "schema": {
-                            "$ref": "#/definitions/handler.ErrorResponse"
+                            "$ref": "#/definitions/internal_handler.ErrorResponse"
                         }
                     }
                 }
@@ -277,25 +277,25 @@ const docTemplate = `{
                     "400": {
                         "description": "invalid post ID / invalid user ID",
                         "schema": {
-                            "$ref": "#/definitions/handler.ErrorResponse"
+                            "$ref": "#/definitions/internal_handler.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/handler.ErrorResponse"
+                            "$ref": "#/definitions/internal_handler.ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "post not found",
                         "schema": {
-                            "$ref": "#/definitions/handler.ErrorResponse"
+                            "$ref": "#/definitions/internal_handler.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "failed to get post",
                         "schema": {
-                            "$ref": "#/definitions/handler.ErrorResponse"
+                            "$ref": "#/definitions/internal_handler.ErrorResponse"
                         }
                     }
                 }
@@ -303,7 +303,7 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "handler.ErrorResponse": {
+        "internal_handler.ErrorResponse": {
             "type": "object",
             "properties": {
                 "error": {
@@ -311,7 +311,7 @@ const docTemplate = `{
                 }
             }
         },
-        "handler.createPostRequest": {
+        "internal_handler.createPostRequest": {
             "type": "object",
             "properties": {
                 "content": {
@@ -322,7 +322,7 @@ const docTemplate = `{
                 }
             }
         },
-        "handler.postResponse": {
+        "internal_handler.postResponse": {
             "type": "object",
             "properties": {
                 "content": {
@@ -340,7 +340,7 @@ const docTemplate = `{
                 }
             }
         },
-        "handler.updatePostRequest": {
+        "internal_handler.updatePostRequest": {
             "type": "object",
             "properties": {
                 "content": {
@@ -368,7 +368,7 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "localhost:8080",
+	Host:             "localhost:8081",
 	BasePath:         "/",
 	Schemes:          []string{"http"},
 	Title:            "Blog API",

@@ -1,18 +1,18 @@
 basePath: /
 definitions:
-  handler.ErrorResponse:
+  internal_handler.ErrorResponse:
     properties:
       error:
         type: string
     type: object
-  handler.createPostRequest:
+  internal_handler.createPostRequest:
     properties:
       content:
         type: string
       title:
         type: string
     type: object
-  handler.postResponse:
+  internal_handler.postResponse:
     properties:
       content:
         type: string
@@ -24,7 +24,7 @@ definitions:
       user_id:
         type: integer
     type: object
-  handler.updatePostRequest:
+  internal_handler.updatePostRequest:
     properties:
       content:
         type: string
@@ -33,7 +33,7 @@ definitions:
       title:
         type: string
     type: object
-host: localhost:8080
+host: localhost:8081
 info:
   contact: {}
   description: REST API для блога с авторизацией, управлением пользователями и постами
@@ -51,30 +51,30 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/handler.createPostRequest'
+          $ref: '#/definitions/internal_handler.createPostRequest'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/handler.postResponse'
+            $ref: '#/definitions/internal_handler.postResponse'
         "400":
           description: invalid JSON / invalid title or content
           schema:
-            $ref: '#/definitions/handler.ErrorResponse'
+            $ref: '#/definitions/internal_handler.ErrorResponse'
         "401":
           description: unauthorized
           schema:
-            $ref: '#/definitions/handler.ErrorResponse'
+            $ref: '#/definitions/internal_handler.ErrorResponse'
         "409":
           description: linked user with this id doesnt exists
           schema:
-            $ref: '#/definitions/handler.ErrorResponse'
+            $ref: '#/definitions/internal_handler.ErrorResponse'
         "500":
           description: failed to create post
           schema:
-            $ref: '#/definitions/handler.ErrorResponse'
+            $ref: '#/definitions/internal_handler.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Create a new post
@@ -101,19 +101,19 @@ paths:
         "400":
           description: invalid post ID / invalid user ID
           schema:
-            $ref: '#/definitions/handler.ErrorResponse'
+            $ref: '#/definitions/internal_handler.ErrorResponse'
         "401":
           description: unauthorized
           schema:
-            $ref: '#/definitions/handler.ErrorResponse'
+            $ref: '#/definitions/internal_handler.ErrorResponse'
         "404":
           description: post not found
           schema:
-            $ref: '#/definitions/handler.ErrorResponse'
+            $ref: '#/definitions/internal_handler.ErrorResponse'
         "500":
           description: failed to get post
           schema:
-            $ref: '#/definitions/handler.ErrorResponse'
+            $ref: '#/definitions/internal_handler.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Delete a post
@@ -134,7 +134,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/handler.updatePostRequest'
+          $ref: '#/definitions/internal_handler.updatePostRequest'
       produces:
       - application/json
       responses:
@@ -145,19 +145,19 @@ paths:
         "400":
           description: invalid post ID / invalid JSON / invalid user ID
           schema:
-            $ref: '#/definitions/handler.ErrorResponse'
+            $ref: '#/definitions/internal_handler.ErrorResponse'
         "401":
           description: unauthorized
           schema:
-            $ref: '#/definitions/handler.ErrorResponse'
+            $ref: '#/definitions/internal_handler.ErrorResponse'
         "404":
           description: user not found
           schema:
-            $ref: '#/definitions/handler.ErrorResponse'
+            $ref: '#/definitions/internal_handler.ErrorResponse'
         "500":
           description: failed to get post
           schema:
-            $ref: '#/definitions/handler.ErrorResponse'
+            $ref: '#/definitions/internal_handler.ErrorResponse'
       security:
       - BearerAuth: []
       summary: Update a post
@@ -181,19 +181,19 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/handler.postResponse'
+            $ref: '#/definitions/internal_handler.postResponse'
         "400":
           description: invalid post ID
           schema:
-            $ref: '#/definitions/handler.ErrorResponse'
+            $ref: '#/definitions/internal_handler.ErrorResponse'
         "404":
           description: post not found
           schema:
-            $ref: '#/definitions/handler.ErrorResponse'
+            $ref: '#/definitions/internal_handler.ErrorResponse'
         "500":
           description: failed to get post
           schema:
-            $ref: '#/definitions/handler.ErrorResponse'
+            $ref: '#/definitions/internal_handler.ErrorResponse'
       summary: Get post by ID
       tags:
       - posts
@@ -215,15 +215,15 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/handler.postResponse'
+            $ref: '#/definitions/internal_handler.postResponse'
         "400":
           description: invalid post title / failed to get post
           schema:
-            $ref: '#/definitions/handler.ErrorResponse'
+            $ref: '#/definitions/internal_handler.ErrorResponse'
         "404":
           description: post not found
           schema:
-            $ref: '#/definitions/handler.ErrorResponse'
+            $ref: '#/definitions/internal_handler.ErrorResponse'
       summary: Get post by title
       tags:
       - posts
