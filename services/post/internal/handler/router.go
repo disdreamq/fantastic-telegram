@@ -2,6 +2,7 @@ package handler
 
 import (
 	"github.com/disdreamq/fantastic-telegram/services/post/internal/middleware"
+	"github.com/disdreamq/fantastic-telegram/services/post/internal/port"
 	"github.com/go-chi/chi/v5"
 	"github.com/redis/go-redis/v9"
 	"github.com/rs/zerolog"
@@ -10,8 +11,9 @@ import (
 func NewRouter(
 	rdb *redis.Client,
 	postCtrl *PostController,
-	PublicRPM int,
-	ProtectedPRM int,
+	grpcClient port.GRPCClient,
+	publicRPM int,
+	protectedPRM int,
 	logger zerolog.Logger,
 ) *chi.Mux {
 	r := chi.NewRouter()
@@ -26,8 +28,8 @@ func NewRouter(
 
 	// Protected routes
 	r.Group(func(r chi.Router) {
-		// обращение по GRPC TODO r.Use(middleware.NewAuthMiddleware(jwt.NewProvider(secret, expiry)).Authenticate)
-		r.Use(middleware.NewRateLimitMiddleware(rdb, ProtectedPRM).Limit)
+		r.Use(middleware.NewRateLimitMiddleware(rdb, protectedPRM).Limit)
+		r.Use(middleware.NewAuthMiddleware(grpcClient).Authenticate)
 	})
 	r.Route("/posts", func(r chi.Router) {
 		r.Post("/", postCtrl.Create)
