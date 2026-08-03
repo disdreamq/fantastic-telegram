@@ -29,6 +29,7 @@ import (
 
 	"github.com/disdreamq/fantastic-telegram/services/post/internal/handler"
 
+	gr "github.com/disdreamq/fantastic-telegram/services/post/internal/clients/grpc"
 	"github.com/joho/godotenv"
 	"github.com/rs/zerolog"
 	httpSwagger "github.com/swaggo/http-swagger"
@@ -67,7 +68,13 @@ func main() {
 	postSVC := service.NewPostService(postRepo, cache)
 	postCtrl := handler.NewPostController(postSVC)
 
-	r := handler.NewRouter(rdb, postCtrl, cfg.ProtectedRPM, cfg.PublicRPM, logger)
+	// Prepare grpc client
+	grpcClient, err := gr.NewGRPCClient(":" + strconv.FormatInt(int64(cfg.GrpcPort), 10))
+	if err != nil {
+		logger.Fatal().Err(err).Str("component", "GRPC").Msg("GRPC client could not start")
+	}
+
+	r := handler.NewRouter(rdb, postCtrl, grpcClient, cfg.ProtectedRPM, cfg.PublicRPM, logger)
 
 	// Swagger
 	r.Get("/swagger/*", httpSwagger.Handler(
@@ -90,7 +97,6 @@ func main() {
 
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
-
 	<-ctx.Done()
 
 	// Shutdown
@@ -102,6 +108,7 @@ func main() {
 			Err(err).
 			Msg("Server shutdown failed")
 	}
+	grpcClient.Conn.Close()
 	DB.Close()
 	rdb.Close()
 
