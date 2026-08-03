@@ -19,20 +19,23 @@ func NewRouter(
 	r := chi.NewRouter()
 	r.Use(middleware.RecoveryMiddleware)
 	r.Use(middleware.LoggingMiddleware(logger))
+	r.Route("/posts", func(r chi.Router) {
+		// Public routes
+		r.Group(func(r chi.Router) {
+			r.Get("/id/{postID}", postCtrl.GetByID)
+			r.Get("/title/{title}", postCtrl.GetByTitle)
+		})
 
-	// Public routes
-	r.Group(func(r chi.Router) {
-		r.Get("/posts/id/{postID}", postCtrl.GetByID)
-		r.Get("/posts/title/{title}", postCtrl.GetByTitle)
+		// Protected routes
+		r.Group(func(r chi.Router) {
+			r.Use(middleware.NewRateLimitMiddleware(rdb, protectedPRM).Limit)
+			r.Use(middleware.NewAuthMiddleware(grpcClient).Authenticate)
+			r.Post("/", postCtrl.Create)
+			r.Put("/{postID}", postCtrl.Update)
+			r.Delete("/{postID}", postCtrl.Delete)
+		})
+
 	})
 
-	// Protected routes
-	r.Group(func(r chi.Router) {
-		r.Use(middleware.NewRateLimitMiddleware(rdb, protectedPRM).Limit)
-		r.Use(middleware.NewAuthMiddleware(grpcClient).Authenticate)
-		r.Post("/posts/", postCtrl.Create)
-		r.Put("/posts/{postID}", postCtrl.Update)
-		r.Delete("/posts/{postID}", postCtrl.Delete)
-	})
 	return r
 }
