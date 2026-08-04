@@ -73,15 +73,20 @@ func (p *PostService) GetByID(ctx context.Context, postID int64) (*domain.Post, 
 	if !ok {
 		post, err := p.postRepo.GetByID(ctx, postID)
 		if err != nil {
-			logger.Error().
-				Err(err).
-				Str("trace_id", trace_id).
-				Int64("post ID", postID).
-				Msg("Read post by ID error in post service.")
 			switch err {
 			case sql.ErrNoRows:
+				logger.Debug().
+					Err(err).
+					Str("trace_id", trace_id).
+					Int64("post ID", postID).
+					Msg("Read post by ID error in post service.")
 				return nil, ErrPostNotFound
 			default:
+				logger.Error().
+					Err(err).
+					Str("trace_id", trace_id).
+					Int64("post ID", postID).
+					Msg("Read post by ID error in post service.")
 				return nil, ErrUnexpected
 			}
 		}
@@ -125,15 +130,20 @@ func (p *PostService) GetByTitle(ctx context.Context, title string) (*domain.Pos
 	if !ok {
 		post, err := p.postRepo.GetByTitle(ctx, title)
 		if err != nil {
-			logger.Error().
-				Err(err).
-				Str("trace_id", trace_id).
-				Str("title", title).
-				Msg("Read post by title error in post service.")
 			switch err {
 			case sql.ErrNoRows:
+				logger.Debug().
+					Err(err).
+					Str("trace_id", trace_id).
+					Str("title", title).
+					Msg("Read post by title error in post service.")
 				return nil, ErrPostNotFound
 			default:
+				logger.Error().
+					Err(err).
+					Str("trace_id", trace_id).
+					Str("title", title).
+					Msg("Read post by title error in post service.")
 				return nil, ErrUnexpected
 			}
 		}
