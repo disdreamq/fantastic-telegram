@@ -2,7 +2,6 @@ package client
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"google.golang.org/grpc"
@@ -48,7 +47,9 @@ func (c *grpcClient) ValidateToken(ctx context.Context, token string) (*domain.C
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println(req, resp, resp.UserID, resp.UserEmail)
+	if !resp.Valid {
+		return nil, domain.ErrInvalidToken
+	}
 	return &domain.Claims{
 		UserID: resp.UserID,
 		Email:  resp.UserEmail,
