@@ -69,7 +69,7 @@ func main() {
 	postCtrl := handler.NewPostController(postSVC)
 
 	// Prepare grpc client
-	grpcClient, err := gr.NewGRPCClient(":" + strconv.FormatInt(int64(cfg.GrpcPort), 10))
+	grpcClient, err := gr.NewGRPCClient("user:" + strconv.FormatInt(int64(cfg.GrpcPort), 10))
 	if err != nil {
 		logger.Fatal().Err(err).Str("component", "GRPC").Msg("GRPC client could not start")
 	}
