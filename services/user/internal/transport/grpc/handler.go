@@ -2,7 +2,6 @@ package grpc
 
 import (
 	"context"
-	"strings"
 
 	"github.com/disdreamq/fantastic-telegram/services/user/internal/port"
 	pb "github.com/disdreamq/fantastic-telegram/services/user/proto"
@@ -16,15 +15,10 @@ type userServer struct {
 }
 
 func (s *userServer) ValidateToken(ctx context.Context, in *pb.ValidateTokenRequest) (*pb.ValidateTokenResponse, error) {
-	authValues := strings.Split(in.Token, " ")
-	if len(authValues) == 0 {
+	if in.Token == "" {
 		return nil, status.Errorf(codes.Unauthenticated, "missing auth header")
 	}
-	if len(authValues) != 2 || authValues[0] != "Bearer" {
-		return nil, status.Errorf(codes.Unauthenticated, "missing auth header")
-	}
-	token := authValues[1]
-	payload, err := s.p.ValidateToken(token)
+	payload, err := s.p.ValidateToken(in.Token)
 	if err != nil {
 		return nil, status.Errorf(codes.Unauthenticated, "invalid token")
 	}
