@@ -75,6 +75,7 @@ services:
       REDIS_USERNAME: ${REDIS_USERNAME}
       REDIS_PASSWORD: ${REDIS_PASSWORD}
       POST_HTTP_PORT: ${POST_HTTP_PORT}
+      GRPC_PORT: ${GRPC_PORT}
     ports:
      - "${POST_HTTP_PORT}:${POST_HTTP_PORT}"
     depends_on:
