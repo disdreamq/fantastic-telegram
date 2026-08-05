@@ -22,8 +22,12 @@ import (
 
 	"github.com/disdreamq/fantastic-telegram/services/post/config"
 	"github.com/disdreamq/fantastic-telegram/services/post/internal/repository/postgres"
+	o "github.com/disdreamq/fantastic-telegram/services/post/internal/repository/postgres/outbox"
+	"github.com/disdreamq/fantastic-telegram/services/post/internal/repository/postgres/post"
 	"github.com/disdreamq/fantastic-telegram/services/post/internal/repository/redis"
-	"github.com/disdreamq/fantastic-telegram/services/post/internal/service"
+	"github.com/disdreamq/fantastic-telegram/services/post/internal/service/outbox"
+	p "github.com/disdreamq/fantastic-telegram/services/post/internal/service/post"
+	"github.com/segmentio/kafka-go"
 
 	_ "github.com/disdreamq/fantastic-telegram/services/post/docs"
 
@@ -63,9 +67,19 @@ func main() {
 	if err != nil {
 		logger.Fatal().Err(err).Str("component", "Postgres").Msg("Postgres could not connect to db.")
 	}
+
+	// Prepare producer
+	writer := &kafka.Writer{Addr: kafka.TCP(cfg.KafkaHost + ":" + strconv.FormatInt(int64(cfg.KafkaPort), 10)), Topic: cfg.KafkaTopic}
+	defer writer.Close()
+	outboxRepo := o.NewOutboxRepository(DB)
+	producer := outbox.NewOutboxProducer(outboxRepo, writer, time.Duration(60000000000))
+	ctx := context.Background()
+	ctx = logger.WithContext(ctx)
+	producer.Run(ctx)
+
 	// Prepare post controller
-	postRepo := postgres.NewPostRepository(DB)
-	postSVC := service.NewPostService(postRepo, cache)
+	postRepo := post.NewPostRepository(DB)
+	postSVC := p.NewPostService(postRepo, cache)
 	postCtrl := handler.NewPostController(postSVC)
 
 	// Prepare grpc client
@@ -74,7 +88,7 @@ func main() {
 		logger.Fatal().Err(err).Str("component", "GRPC").Msg("GRPC client could not start")
 	}
 
-	r := handler.NewRouter(rdb, postCtrl, grpcClient, cfg.ProtectedRPM, cfg.PublicRPM, logger)
+	r := handler.NewRouter(rdb, postCtrl, grpcClient, cfg.ProtectedRPM, cfg.PublicRPM, &logger)
 
 	// Swagger
 	r.Get("/swagger/*", httpSwagger.Handler(
@@ -108,6 +122,7 @@ func main() {
 			Err(err).
 			Msg("Server shutdown failed")
 	}
+	ctx.Done() // closing producer
 	grpcClient.Conn.Close()
 	DB.Close()
 	rdb.Close()
