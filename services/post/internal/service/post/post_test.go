@@ -1,4 +1,4 @@
-package service_test
+package post_test
 
 import (
 	"context"
@@ -10,6 +10,7 @@ import (
 
 	"github.com/disdreamq/fantastic-telegram/services/post/internal/domain"
 	"github.com/disdreamq/fantastic-telegram/services/post/internal/service"
+	"github.com/disdreamq/fantastic-telegram/services/post/internal/service/post"
 )
 
 type mockPostRepo struct {
@@ -79,7 +80,7 @@ func TestPostService_Create(t *testing.T) {
 			return prepPost, nil
 		},
 		}
-		svc := service.NewPostService(repo, cache)
+		svc := post.NewPostService(repo, cache)
 		postFromSVC, err := svc.Create(context.Background(), prepPost.UserID, prepPost.Title, prepPost.Content)
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
@@ -102,7 +103,7 @@ func TestPostService_Create(t *testing.T) {
 			return prepPost, nil
 		},
 		}
-		svc := service.NewPostService(repo, cache)
+		svc := post.NewPostService(repo, cache)
 		postFromSVC, err := svc.Create(context.Background(), prepPost.UserID, prepPost.Title, prepPost.Content)
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
@@ -124,7 +125,7 @@ func TestPostService_Create(t *testing.T) {
 			return nil, sql.ErrNoRows
 		},
 		}
-		svc := service.NewPostService(repo, cache)
+		svc := post.NewPostService(repo, cache)
 		_, err := svc.Create(context.Background(), prepPost.UserID, prepPost.Title, prepPost.Content)
 		if err == nil {
 			t.Errorf("expected %v, got nil", service.ErrLinkedUserNotFound)
@@ -149,7 +150,7 @@ func TestPostService_GetByID(t *testing.T) {
 			return prepPost, nil
 		},
 		}
-		svc := service.NewPostService(repo, cache)
+		svc := post.NewPostService(repo, cache)
 		postFromSVC, err := svc.GetByID(context.Background(), prepPost.UserID)
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
@@ -177,7 +178,7 @@ func TestPostService_GetByID(t *testing.T) {
 			return nil, nil
 		},
 		}
-		svc := service.NewPostService(repo, cache)
+		svc := post.NewPostService(repo, cache)
 		postFromSVC, err := svc.GetByID(context.Background(), prepPost.UserID)
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
@@ -202,7 +203,7 @@ func TestPostService_GetByID(t *testing.T) {
 			return prepPost, nil
 		},
 		}
-		svc := service.NewPostService(repo, cache)
+		svc := post.NewPostService(repo, cache)
 		postFromSVC, err := svc.GetByID(context.Background(), prepPost.UserID)
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
@@ -227,7 +228,7 @@ func TestPostService_GetByID(t *testing.T) {
 			return nil, sql.ErrNoRows
 		},
 		}
-		svc := service.NewPostService(repo, cache)
+		svc := post.NewPostService(repo, cache)
 		_, err := svc.GetByID(context.Background(), 67)
 		if !errors.Is(err, service.ErrPostNotFound) {
 			t.Fatalf("got wrong err: %v, wanted %v", err, service.ErrPostNotFound)
@@ -253,7 +254,7 @@ func TestPostService_GetByTitle(t *testing.T) {
 			return prepPost, nil
 		},
 		}
-		svc := service.NewPostService(repo, cache)
+		svc := post.NewPostService(repo, cache)
 		postFromSVC, err := svc.GetByTitle(context.Background(), prepPost.Title)
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
@@ -284,7 +285,7 @@ func TestPostService_GetByTitle(t *testing.T) {
 			return nil, nil
 		},
 		}
-		svc := service.NewPostService(repo, cache)
+		svc := post.NewPostService(repo, cache)
 		postFromSVC, err := svc.GetByTitle(context.Background(), prepPost.Title)
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
@@ -312,7 +313,7 @@ func TestPostService_GetByTitle(t *testing.T) {
 			return prepPost, nil
 		},
 		}
-		svc := service.NewPostService(repo, cache)
+		svc := post.NewPostService(repo, cache)
 		postFromSVC, err := svc.GetByTitle(context.Background(), prepPost.Title)
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
@@ -337,7 +338,7 @@ func TestPostService_GetByTitle(t *testing.T) {
 			return nil, sql.ErrNoRows
 		},
 		}
-		svc := service.NewPostService(repo, cache)
+		svc := post.NewPostService(repo, cache)
 		_, err := svc.GetByTitle(context.Background(), "aaaa")
 		if !errors.Is(err, service.ErrPostNotFound) {
 			t.Fatalf("got wrong err: %v, wanted %v", err, service.ErrPostNotFound)
@@ -364,7 +365,7 @@ func TestPostService_UpdateWithValidate(t *testing.T) {
 			return nil
 		},
 		}
-		svc := service.NewPostService(repo, cache)
+		svc := post.NewPostService(repo, cache)
 		if err := svc.UpdateWithValidate(context.Background(), prepPost.UserID, prepPost.ID, prepPost.Title, prepPost.Content); err != nil {
 			t.Fatalf("got err %v, wanted %v", err, nil)
 			if cache.DelCalls != 2 {
@@ -389,7 +390,7 @@ func TestPostService_UpdateWithValidate(t *testing.T) {
 			return sql.ErrNoRows
 		},
 		}
-		svc := service.NewPostService(repo, cache)
+		svc := post.NewPostService(repo, cache)
 		if err := svc.UpdateWithValidate(context.Background(), prepPost.UserID, prepPost.ID, prepPost.Title, prepPost.Content); !errors.Is(err, service.ErrUpdatePostFailed) {
 			t.Fatalf("got err %v, wanted %v", err, nil)
 			if cache.DelCalls != 2 {
@@ -414,7 +415,7 @@ func TestPostService_UpdateWithValidate(t *testing.T) {
 			return sql.ErrNoRows
 		},
 		}
-		svc := service.NewPostService(repo, cache)
+		svc := post.NewPostService(repo, cache)
 		if err := svc.UpdateWithValidate(context.Background(), prepPost.UserID, prepPost.ID, prepPost.Title, prepPost.Content); !errors.Is(err, service.ErrUpdatePostFailed) {
 			t.Fatalf("got err %v, wanted %v", err, nil)
 			if cache.DelCalls != 2 {
@@ -442,7 +443,7 @@ func TestPostService_Update(t *testing.T) {
 			return nil
 		},
 		}
-		svc := service.NewPostService(repo, cache)
+		svc := post.NewPostService(repo, cache)
 		if err := svc.Update(context.Background(), prepPost.ID, prepPost.Title, prepPost.Content); err != nil {
 			t.Fatalf("got err %v, wanted %v", err, nil)
 			if cache.DelCalls != 2 {
@@ -467,7 +468,7 @@ func TestPostService_Update(t *testing.T) {
 			return sql.ErrNoRows
 		},
 		}
-		svc := service.NewPostService(repo, cache)
+		svc := post.NewPostService(repo, cache)
 		if err := svc.Update(context.Background(), prepPost.ID, prepPost.Title, prepPost.Content); !errors.Is(err, service.ErrPostNotFound) {
 			t.Fatalf("got err %v, wanted %v", err, nil)
 			if cache.DelCalls != 2 {
@@ -491,7 +492,7 @@ func TestPostService_DeleteWithValidate(t *testing.T) {
 			return "Test Post", nil
 		},
 		}
-		svc := service.NewPostService(repo, cache)
+		svc := post.NewPostService(repo, cache)
 		if err := svc.DeleteWithValidate(context.Background(), 6767, 5252); err != nil {
 			t.Fatalf("got err %v, wanted %v", err, nil)
 		}
@@ -509,7 +510,7 @@ func TestPostService_DeleteWithValidate(t *testing.T) {
 			return "", sql.ErrNoRows
 		},
 		}
-		svc := service.NewPostService(repo, cache)
+		svc := post.NewPostService(repo, cache)
 		if err := svc.DeleteWithValidate(context.Background(), 6767, 5252); !errors.Is(err, service.ErrDeletePostFailed) {
 			t.Fatalf("got err %v, wanted %v", err, nil)
 		}
@@ -526,7 +527,7 @@ func TestPostService_DeleteWithValidate(t *testing.T) {
 			return "", sql.ErrNoRows
 		},
 		}
-		svc := service.NewPostService(repo, cache)
+		svc := post.NewPostService(repo, cache)
 		if err := svc.DeleteWithValidate(context.Background(), 6767, 5252); !errors.Is(err, service.ErrDeletePostFailed) {
 			t.Fatalf("got err %v, wanted %v", err, nil)
 		}
@@ -546,7 +547,7 @@ func TestPostService_Delete(t *testing.T) {
 			return "Test Post", nil
 		},
 		}
-		svc := service.NewPostService(repo, cache)
+		svc := post.NewPostService(repo, cache)
 		if err := svc.Delete(context.Background(), 6767); err != nil {
 			t.Fatalf("got err %v, wanted %v", err, nil)
 		}
@@ -564,7 +565,7 @@ func TestPostService_Delete(t *testing.T) {
 			return "", sql.ErrNoRows
 		},
 		}
-		svc := service.NewPostService(repo, cache)
+		svc := post.NewPostService(repo, cache)
 		if err := svc.Delete(context.Background(), 6767); !errors.Is(err, service.ErrPostNotFound) {
 			t.Fatalf("got err %v, wanted %v", err, nil)
 		}

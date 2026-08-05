@@ -1,4 +1,4 @@
-package service
+package post
 
 import (
 	"context"
@@ -9,6 +9,7 @@ import (
 
 	"github.com/disdreamq/fantastic-telegram/services/post/internal/domain"
 	"github.com/disdreamq/fantastic-telegram/services/post/internal/port"
+	"github.com/disdreamq/fantastic-telegram/services/post/internal/service"
 	"github.com/rs/zerolog/log"
 )
 
@@ -43,7 +44,7 @@ func (p *PostService) Create(ctx context.Context, userID int64, title, content s
 			Int64("user_id", userID).
 			Str("title", title).
 			Msg("Create post error in post service.")
-		return nil, ErrLinkedUserNotFound
+		return nil, service.ErrLinkedUserNotFound
 	}
 	data, err := json.Marshal(post)
 	if err != nil {
@@ -80,14 +81,14 @@ func (p *PostService) GetByID(ctx context.Context, postID int64) (*domain.Post, 
 					Str("trace_id", trace_id).
 					Int64("post ID", postID).
 					Msg("Read post by ID error in post service.")
-				return nil, ErrPostNotFound
+				return nil, service.ErrPostNotFound
 			default:
 				logger.Error().
 					Err(err).
 					Str("trace_id", trace_id).
 					Int64("post ID", postID).
 					Msg("Read post by ID error in post service.")
-				return nil, ErrUnexpected
+				return nil, service.ErrUnexpected
 			}
 		}
 		data, err := json.Marshal(post)
@@ -112,7 +113,7 @@ func (p *PostService) GetByID(ctx context.Context, postID int64) (*domain.Post, 
 			Str("trace_id", trace_id).
 			Int64("post ID", postID).
 			Msg("Read post by ID error in post service.")
-		return nil, ErrCacheUnmarshal
+		return nil, service.ErrCacheUnmarshal
 	}
 
 	logger.Debug().
@@ -137,14 +138,14 @@ func (p *PostService) GetByTitle(ctx context.Context, title string) (*domain.Pos
 					Str("trace_id", trace_id).
 					Str("title", title).
 					Msg("Read post by title error in post service.")
-				return nil, ErrPostNotFound
+				return nil, service.ErrPostNotFound
 			default:
 				logger.Error().
 					Err(err).
 					Str("trace_id", trace_id).
 					Str("title", title).
 					Msg("Read post by title error in post service.")
-				return nil, ErrUnexpected
+				return nil, service.ErrUnexpected
 			}
 		}
 		data, err := json.Marshal(post)
@@ -170,7 +171,7 @@ func (p *PostService) GetByTitle(ctx context.Context, title string) (*domain.Pos
 			Str("trace_id", trace_id).
 			Str("title", title).
 			Msg("Read post by title error in post service.")
-		return nil, ErrCacheUnmarshal
+		return nil, service.ErrCacheUnmarshal
 	}
 
 	logger.Debug().
@@ -204,9 +205,9 @@ func (p *PostService) UpdateWithValidate(ctx context.Context, currUserID, postID
 			Msg("Update post with validate error in post service.")
 		switch err {
 		case sql.ErrNoRows:
-			return ErrUpdatePostFailed
+			return service.ErrUpdatePostFailed
 		default:
-			return ErrUnexpected
+			return service.ErrUnexpected
 		}
 	}
 
@@ -243,9 +244,9 @@ func (p *PostService) Update(ctx context.Context, postID int64, title, content s
 			Msg("Update post error in post service.")
 		switch err {
 		case sql.ErrNoRows:
-			return ErrPostNotFound
+			return service.ErrPostNotFound
 		default:
-			return ErrUnexpected
+			return service.ErrUnexpected
 		}
 	}
 
@@ -271,9 +272,9 @@ func (p *PostService) Delete(ctx context.Context, postID int64) error {
 			Msg("Delete post error in post service.")
 		switch err {
 		case sql.ErrNoRows:
-			return ErrPostNotFound
+			return service.ErrPostNotFound
 		default:
-			return ErrUnexpected
+			return service.ErrUnexpected
 		}
 	}
 
@@ -299,9 +300,9 @@ func (p *PostService) DeleteWithValidate(ctx context.Context, currUserID, postID
 			Msg("Delete post with validate error in post service.")
 		switch err {
 		case sql.ErrNoRows:
-			return ErrDeletePostFailed
+			return service.ErrDeletePostFailed
 		default:
-			return ErrUnexpected
+			return service.ErrUnexpected
 		}
 	}
 

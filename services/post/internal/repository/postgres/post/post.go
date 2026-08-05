@@ -1,11 +1,13 @@
-package postgres
+package post
 
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 	"time"
 
 	"github.com/disdreamq/fantastic-telegram/services/post/internal/domain"
+	"github.com/disdreamq/fantastic-telegram/services/post/internal/repository/postgres"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -47,13 +49,21 @@ func (r *PostRepository) Create(ctx context.Context, post *domain.Post) (*domain
 	txCtx, cancel := context.WithTimeout(ctx, 2*time.Second)
 	defer cancel()
 
+	// Step away from clean architecture, but i dont want to change whole service for 6 lines
+	payload, err := json.Marshal(post)
+	if err != nil {
+		return nil, err
+	}
+
 	query := `
         INSERT INTO posts (user_id, title, content)
         VALUES ($1, $2, $3)
-        RETURNING *
+        RETURNING *;
+		INSERT INTO posts_outbox (payload)
+		VALUES $4;
     `
 	var dbPost dbPost
-	err = tx.GetContext(txCtx, &dbPost, query, post.UserID, post.Title, post.Content)
+	err = tx.GetContext(txCtx, &dbPost, query, post.UserID, post.Title, post.Content, string(payload))
 	if err != nil {
 		return nil, err
 	}
@@ -139,7 +149,7 @@ func (r *PostRepository) Update(ctx context.Context, post *domain.Post) error {
 		return err
 	}
 	if rows == 0 {
-		return ErrNoRows
+		return postgres.ErrNoRows
 	}
 
 	if err = tx.Commit(); err != nil {
@@ -168,7 +178,7 @@ func (r *PostRepository) UpdateWithValidate(ctx context.Context, currUserID int6
 		return err
 	}
 	if rows == 0 {
-		return ErrNoRows
+		return postgres.ErrNoRows
 	}
 
 	if err = tx.Commit(); err != nil {
