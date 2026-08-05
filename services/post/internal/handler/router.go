@@ -14,7 +14,7 @@ func NewRouter(
 	grpcClient port.GRPCClient,
 	publicRPM int,
 	protectedPRM int,
-	logger zerolog.Logger,
+	logger *zerolog.Logger,
 ) *chi.Mux {
 	r := chi.NewRouter()
 	r.Use(middleware.RecoveryMiddleware)
