@@ -42,6 +42,11 @@ type Config struct {
 	// Ports
 	HttpPort int `envconfig:"POST_HTTP_PORT" default:"8081"`
 	GrpcPort int `envconfig:"GRPC_PORT" default:"50051"`
+
+	// Kafka
+	KafkaTopic string `envconfig:"KAFKA_TOPIC" required:"true"`
+	KafkaHost  string `envconfig:"KAFKA_BROKER_HOST" required:"true"`
+	KafkaPort  int    `envconfig:"KAFKA_BROKER_PORT" required:"true"`
 }
 
 func (c *Config) PostgresDSN() string {
