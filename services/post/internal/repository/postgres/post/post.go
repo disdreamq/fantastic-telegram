@@ -49,21 +49,27 @@ func (r *PostRepository) Create(ctx context.Context, post *domain.Post) (*domain
 	txCtx, cancel := context.WithTimeout(ctx, 2*time.Second)
 	defer cancel()
 
-	// Step away from clean architecture, but i dont want to change whole service for 6 lines
-	payload, err := json.Marshal(post)
+	query := `
+        INSERT INTO posts (user_id, title, content)
+        VALUES ($1, $2, $3)
+        RETURNING *
+    `
+	var dbPost dbPost
+	err = tx.GetContext(txCtx, &dbPost, query, post.UserID, post.Title, post.Content)
 	if err != nil {
 		return nil, err
 	}
 
-	query := `
-        INSERT INTO posts (user_id, title, content)
-        VALUES ($1, $2, $3)
-        RETURNING *;
-		INSERT INTO posts_outbox (payload)
-		VALUES $4;
-    `
-	var dbPost dbPost
-	err = tx.GetContext(txCtx, &dbPost, query, post.UserID, post.Title, post.Content, string(payload))
+	// Step away from clean architecture, but i dont want to change whole service for 6 lines
+	traceID, _ := ctx.Value("trace_id").(string)
+	payload := domain.NewOutboxPayload(dbPost.toDomain(), traceID)
+	p, err := json.Marshal(payload)
+	if err != nil {
+		return nil, err
+	}
+
+	queryOutbox := `INSERT INTO posts_outbox (payload) VALUES ($1)`
+	_, err = tx.ExecContext(txCtx, queryOutbox, string(p))
 	if err != nil {
 		return nil, err
 	}
