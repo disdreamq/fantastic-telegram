@@ -9,15 +9,19 @@ import (
 )
 
 type dbOutboxPost struct {
-	id        int64     `db:"id"`
-	payload   string    `db:"payload"`
-	status    string    `db:"status"`
-	createdAt time.Time `db:"created_at"`
-	updatedAt time.Time `db:"updated_at"`
+	ID        int64     `db:"id"`
+	Payload   string    `db:"payload"`
+	Status    string    `db:"status"`
+	CreatedAt time.Time `db:"created_at"`
+	UpdatedAt time.Time `db:"updated_at"`
 }
 
 func (d *dbOutboxPost) toDomain() *domain.OutboxPost {
-	return domain.NewOutboxPost(d.payload, d.status)
+	return &domain.OutboxPost{
+		ID:      d.ID,
+		Payload: d.Payload,
+		Status:  d.Status,
+	}
 }
 
 type OutboxRepository struct {
@@ -31,46 +35,60 @@ func NewOutboxRepository(db *sqlx.DB) *OutboxRepository {
 func (r *OutboxRepository) GetPosts(ctx context.Context) ([]*domain.OutboxPost, error) {
 	tx, err := r.db.Beginx()
 	if err != nil {
-		return []*domain.OutboxPost{}, err
+		return nil, err
 	}
 	defer tx.Rollback()
+
 	txCtx, cancel := context.WithTimeout(ctx, 2*time.Second)
 	defer cancel()
 
 	query := `
-		SELECT * FROM posts_outbox
-		WHERE processed_at IS NULL
-		ORDER BY created_at
-		LIMIT 10
-		FOR UPDATE SKIP LOCKED
-	`
-	var oPosts []*dbOutboxPost
-	if err = r.db.SelectContext(txCtx, &oPosts, query); err != nil {
-		return []*domain.OutboxPost{}, err
+        SELECT * FROM posts_outbox
+        WHERE status != 'PROCESSED'
+        ORDER BY created_at
+        LIMIT 10
+        FOR UPDATE SKIP LOCKED
+    `
+	var oPosts []dbOutboxPost
+	if err = tx.SelectContext(txCtx, &oPosts, query); err != nil {
+		return nil, err
 	}
-	res := make([]*domain.OutboxPost, len(oPosts))
-	for _, post := range oPosts {
-		res = append(res, post.toDomain())
+
+	res := make([]*domain.OutboxPost, 0, len(oPosts))
+	for i := range oPosts {
+		res = append(res, oPosts[i].toDomain())
 	}
 	return res, nil
 }
 
 func (r *OutboxRepository) UpdatePosts(ctx context.Context, ids []int64) error {
+	if len(ids) == 0 {
+		return nil
+	}
+
 	tx, err := r.db.Beginx()
 	if err != nil {
 		return err
 	}
 	defer tx.Rollback()
+
 	txCtx, cancel := context.WithTimeout(ctx, 2*time.Second)
 	defer cancel()
 
-	query := `
-	UPDATE posts_outbox
-	SET processed_at = NOW()
-	WHERE id IN ($1)
-`
-	if _, err = tx.ExecContext(txCtx, query, ids); err != nil {
+	query, args, err := sqlx.In(`
+        UPDATE posts_outbox
+        SET updated_at = NOW(), status = 'PROCESSED'
+        WHERE id IN (?)
+    `, ids)
+	if err != nil {
 		return err
 	}
-	return nil
+	query = tx.Rebind(query)
+
+	_, err = tx.ExecContext(txCtx, query, args...)
+	if err != nil {
+		return err
+	}
+
+	return tx.Commit()
 }

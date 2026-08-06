@@ -55,6 +55,9 @@ func main() {
 	}
 	cfg := config.Load()
 
+	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
+	defer stop()
+
 	// Connect to redis
 	rdb, err := redis.RedisConnect(cfg)
 	if err != nil {
@@ -69,14 +72,15 @@ func main() {
 	}
 
 	// Prepare producer
-	writer := &kafka.Writer{Addr: kafka.TCP(cfg.KafkaHost + ":" + strconv.FormatInt(int64(cfg.KafkaPort), 10)), Topic: cfg.KafkaTopic}
+	brokers := []string{cfg.KafkaHost + ":" + strconv.FormatInt(int64(cfg.KafkaPort), 10)}
+	writer := kafka.NewWriter(kafka.WriterConfig{Brokers: brokers, Topic: cfg.KafkaTopic})
 	defer writer.Close()
 	outboxRepo := o.NewOutboxRepository(DB)
-	producer := outbox.NewOutboxProducer(outboxRepo, writer, time.Duration(60000000000))
-	ctx := context.Background()
+	producer := outbox.NewOutboxProducer(outboxRepo, writer, 5*time.Second)
 	ctx = logger.WithContext(ctx)
-	producer.Run(ctx)
+	go producer.Run(ctx)
 
+	logger.Info().Msg("Producer started")
 	// Prepare post controller
 	postRepo := post.NewPostRepository(DB)
 	postSVC := p.NewPostService(postRepo, cache)
@@ -109,8 +113,6 @@ func main() {
 		}
 	}()
 
-	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
-	defer stop()
 	<-ctx.Done()
 
 	// Shutdown
@@ -122,7 +124,6 @@ func main() {
 			Err(err).
 			Msg("Server shutdown failed")
 	}
-	ctx.Done() // closing producer
 	grpcClient.Conn.Close()
 	DB.Close()
 	rdb.Close()

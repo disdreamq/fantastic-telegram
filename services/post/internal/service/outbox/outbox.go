@@ -48,14 +48,20 @@ func (p *Producer) Run(ctx context.Context) {
 
 func (s *Producer) Process(ctx context.Context) {
 	logger := log.Ctx(ctx)
-	ctx, cancel := context.WithTimeout(ctx, 2*time.Second)
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 	posts, err := s.outboxRepo.GetPosts(ctx)
-	if err != nil {
+	if len(posts) == 0 {
 		return
 	}
-	msgs := make([]kafka.Message, len(posts))
-	ids := make([]int64, len(posts))
+	if err != nil {
+		logger.Error().
+			Err(err).
+			Msg("Failed to send posts to kafka")
+		return
+	}
+	msgs := make([]kafka.Message, 0, len(posts))
+	ids := make([]int64, 0, len(posts))
 	for _, post := range posts {
 		msg := kafka.Message{
 			Value: []byte(post.Payload),
@@ -76,6 +82,7 @@ func (s *Producer) Process(ctx context.Context) {
 			Err(err).
 			Str("IDs", b.String()).
 			Msg("Failed to send posts to kafka")
+		return
 	}
 
 	if err := s.outboxRepo.UpdatePosts(ctx, ids); err != nil {
@@ -85,7 +92,7 @@ func (s *Producer) Process(ctx context.Context) {
 			Msg("Failed to update posts in outbox db")
 	}
 
-	logger.Debug().
+	logger.Info().
 		Str("IDs", b.String()).
 		Msg("Send posts to kafka")
 }
