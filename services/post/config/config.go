@@ -1,3 +1,4 @@
+// Package config
 package config
 
 import (
@@ -70,9 +71,7 @@ func (c *Config) RedisAddr() string {
 
 func Load() *Config {
 	once.Do(func() {
-		var err error
-		err = envconfig.Process("", &cfg)
-		if err != nil {
+		if err := envconfig.Process("", &cfg); err != nil {
 			log.Fatalf("config error: %v", err)
 		}
 	})
