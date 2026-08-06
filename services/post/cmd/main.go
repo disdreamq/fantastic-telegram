@@ -40,7 +40,6 @@ import (
 )
 
 func main() {
-
 	// Logging
 	logger := zerolog.New(os.Stdout).With().Timestamp().Logger().Output(zerolog.ConsoleWriter{Out: os.Stdout})
 	zerolog.SetGlobalLevel(zerolog.InfoLevel)
@@ -96,12 +95,12 @@ func main() {
 
 	// Swagger
 	r.Get("/swagger/*", httpSwagger.Handler(
-		httpSwagger.URL("http://localhost:"+strconv.FormatInt(int64(cfg.HttpPort), 10)+"/swagger/doc.json"),
+		httpSwagger.URL("http://localhost:"+strconv.FormatInt(int64(cfg.HTTPPort), 10)+"/swagger/doc.json"),
 	))
 
 	// Start server
 	srv := &http.Server{
-		Addr:    ":" + strconv.FormatInt(int64(cfg.HttpPort), 10),
+		Addr:    ":" + strconv.FormatInt(int64(cfg.HTTPPort), 10),
 		Handler: r,
 	}
 
@@ -127,5 +126,4 @@ func main() {
 	grpcClient.Conn.Close()
 	DB.Close()
 	rdb.Close()
-
 }
