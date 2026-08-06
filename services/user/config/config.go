@@ -37,9 +37,6 @@ type Config struct {
 	PublicRPM    int `envconfig:"PUBLIC_RPM" default:"5"`
 	ProtectedRPM int `envconfig:"PROTECTED_RPM" default:"10"`
 
-	// CORS
-	CORSOrigins []string `envconfig:"CORS_ORIGINS" required:"true"`
-
 	// Logging
 	LogLevel string `envconfig:"LOG_LEVEL" default:"error"`
 
